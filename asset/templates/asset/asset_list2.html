@@ -1,0 +1,198 @@
+{% extends "asset/base.html" %}
+{% load asset_tags %}
+{% block body %}
+    <div class="page-content">
+        <!-- Page Breadcrumb -->
+        <div class="page-breadcrumbs">
+            <ul class="breadcrumb">
+                <li>
+                    <i class="fa fa-home"></i>
+                    <a href="#">Home</a>
+                </li>
+                <li>
+                    <a href="#">Tables</a>
+                </li>
+                <li class="active">Data Tables</li>
+            </ul>
+        </div>
+        <!-- /Page Breadcrumb -->
+
+        <!-- Page Header -->
+        <div class="page-header position-relative">
+            <div class="header-title">
+                <h1>
+                    Data Tables
+                    <small>
+                        <i class="fa fa-angle-right"></i>
+                        jquery plugin for data management
+                    </small>
+                </h1>
+            </div>
+
+            <!--Header Buttons-->
+            <div class="header-buttons">
+                <a class="sidebar-toggler" href="#">
+                    <i class="fa fa-arrows-h"></i>
+                </a>
+                <a class="refresh" id="refresh-toggler" href="">
+                    <i class="glyphicon glyphicon-refresh"></i>
+                </a>
+                <a class="fullscreen" id="fullscreen-toggler" href="#">
+                    <i class="glyphicon glyphicon-fullscreen"></i>
+                </a>
+            </div>
+            <!--Header Buttons End-->
+        </div>
+        <!-- /Page Header -->
+
+        <!-- Page Body -->
+        <div class="page-body">
+            <div class="row">
+                <div class="col-xs-12 col-md-12">
+                    <div class="widget">
+                        <div class="widget-header ">
+                            <span class="widget-caption">Expandable DataTable</span>
+                        </div>
+                        <div class="widget-body">
+                            xxxx
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-xs-12 col-md-12">
+                    <div class="widget">
+                        <div class="widget-header ">
+                            <span class="widget-caption">设备信息{{ page_obj }}</span>
+                            <div class="widget-buttons">
+                                <a href="#" data-toggle="maximize">
+                                    <i class="fa fa-expand"></i>
+                                </a>
+                                <a href="#" data-toggle="collapse">
+                                    <i class="fa fa-minus"></i>
+                                </a>
+                                <a href="#" data-toggle="dispose">
+                                    <i class="fa fa-times"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="widget-body">
+                            <div role="grid" id="editabledatatable_wrapper"
+                                 class="dataTables_wrapper form-inline no-footer">
+                                <div class="DTTT btn-group">
+                                    <a class="btn btn-default DTTT_button_copy" id="ToolTables_editabledatatable_0">
+                                        <span>Copy</span>
+                                        <div style="position: absolute; left: 0px; top: 0px; width: 54px; height: 31px; z-index: 99;">
+                                            <embed id="ZeroClipboard_TableToolsMovie_5"
+                                                   src="assets/swf/copy_csv_xls_pdf.swf" loop="false" menu="false"
+                                                   quality="best" bgcolor="#ffffff" width="54" height="31"
+                                                   name="ZeroClipboard_TableToolsMovie_5" align="middle"
+                                                   allowscriptaccess="always" allowfullscreen="false"
+                                                   type="application/x-shockwave-flash"
+                                                   pluginspage="http://www.macromedia.com/go/getflashplayer"
+                                                   flashvars="id=5&amp;width=54&amp;height=31" wmode="transparent">
+                                        </div>
+                                    </a>
+                                    <a class="btn btn-default DTTT_button_print" id="ToolTables_editabledatatable_1"
+                                       title="View print view"><span>Print</span></a>
+                                    <a class="btn btn-default DTTT_button_collection"
+                                       id="ToolTables_editabledatatable_2"> <span>Save <i class="fa fa-angle-down"></i></span></a>
+                                </div>
+
+                                <div id="editabledatatable_filter" class="dataTables_filter">
+                                    <label>
+                                        <input type="search" class="form-control input-sm"
+                                               aria-controls="editabledatatable">
+                                    </label>
+                                </div>
+
+                                <div class="dataTables_length" id="editabledatatable_length">
+                                    <label>
+                                        <select id="page"　onchange='Page()' name="editabledatatable_length"
+                                                aria-controls="editabledatatable"
+                                                class="form-control input-sm">
+                                            <option value="5">5</option>
+                                            <option value="15">15</option>
+                                            <option value="20">20</option>
+                                            <option value="100">100</option>
+                                            <option value="-1">All</option>
+                                            <a id="pageSub" class="hide"></a>
+                                        </select>
+                                    </label>
+                                </div>
+                                <table class="table table-striped table-bordered table-hover" id="expandabledatatable">
+                                    <thead>
+                                    {% thead model_name object_list.0 %}
+                                    </thead>
+
+                                    <tbody>
+                                    {% tbody model_name object_list page_obj %}
+                                    </tbody>
+                                </table>
+                                <!-- Page -->
+                                <div class="row DTTTFooter">
+                                    <div class="col-sm-6">
+                                        <div class="dataTables_info" id="simpledatatable_info" role="alert"
+                                             aria-live="polite" aria-relevant="all">第{{ page_obj.number }}页
+                                            ，共{{ page_obj.paginator.num_pages }}页
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="dataTables_paginate paging_bootstrap" id="simpledatatable_paginate">
+                                            <ul class="pagination">
+                                                <li class="prev">
+                                                    {% if page_obj.has_previous %}
+                                                        <a href="{% url 'asset:list' model_name=model_name %}?page={{ page_obj.previous_page_number }}">Prev</a>
+                                                    {% else %}
+                                                        <a href="#">Prev</a>
+                                                    {% endif %}
+                                                </li>
+
+                                                {% for i in page_obj.paginator.page_range %}
+                                                    {% if page_obj.number == i %}
+                                                        <li class="active">
+                                                            <a href="{% url 'asset:list' model_name=model_name %}?page={{ i }}"> {{ i }} </a>
+                                                        </li>
+                                                    {% else %}
+                                                        <li>
+                                                            <a href="{% url 'asset:list' model_name=model_name %}?page={{ i }}"> {{ i }} </a>
+                                                        </li>
+                                                    {% endif %}
+                                                {% endfor %}
+
+                                                <li class="next">
+                                                    {% if page_obj.has_next %}
+                                                        <a href="{% url 'asset:list' model_name=model_name %}?page={{ page_obj.next_page_number }}">Next</a>
+                                                    {% else %}
+                                                        <a href="#">next</a>
+                                                    {% endif %}
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /Page -->
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /Page Body -->
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        function Page() {
+            /*分页*/
+            var page_val = "?" + "page=" + $("#page").val()
+            $("#pageSub").attr("href", "{% url 'asset:list' model_name=model_name %}" + page_val)
+            $("#pageSub")[0].click()
+        }
+
+    </script>
+{% endblock %}

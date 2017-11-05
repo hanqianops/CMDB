@@ -301,3 +301,5 @@ class NewAssetApprovalZone(models.Model):
     class Meta:
         verbose_name = '新上线待批准资产'
         verbose_name_plural = "新上线待批准资产"
+
+

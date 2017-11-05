@@ -206,10 +206,13 @@ var InitiateExpandableDataTable = function () {
     return {
         init: function () {
             /* Formatting function for row details */
+
+            // 点击按钮确定是否显示该列详细信息
             function fnFormatDetails(oTable, nTr) {
                 var aData = oTable.fnGetData(nTr);
                 var sOut = '<table>';
-                sOut += '<tr><td rowspan="5" style="padding:0 10px 0 0;"><img src="/static/img/avatars/' + aData[6] + '"/></td><td>Name:</td><td>' + aData[1] + '</td></tr>';
+                sOut += '<tr><td rowspan="5" style="padding:0 10px 0 0;"><img src="/static/img/avatars/' + aData[6] + '"/>';
+                sOut += '</td><td>Name:</td><td>' + aData[1] + '</td></tr>';
                 sOut += '<tr><td>Family:</td><td>' + aData[2] + '</td></tr>';
                 sOut += '<tr><td>Age:</td><td>' + aData[3] + '</td></tr>';
                 sOut += '<tr><td>Positon:</td><td>' + aData[4] + '</td></tr>';
@@ -239,15 +242,15 @@ var InitiateExpandableDataTable = function () {
             var oTable = $('#expandabledatatable').dataTable({
                 "sDom": "Tflt<'row DTTTFooter'<'col-sm-6'i><'col-sm-6'p>>",
                 "aoColumnDefs": [
-                    { "bSortable": false, "aTargets": [0] },
+                    { "bSortable": true, "aTargets": [0] },
                     { "bVisible": false, "aTargets": [6] }
                 ],
-                "aaSorting": [[1, 'asc']],
+                "aaSorting": [[3, 'desc']],     // 第三列排序
                 "aLengthMenu": [
-                   [5, 15, 20, -1],
-                   [5, 15, 20, "All"]
+                   [5, 15, 20, 100, -1],
+                   [5, 15, 20,100, "All"]
                 ],
-                "iDisplayLength": 5,
+                "iDisplayLength": 15,     // 默认分页
                 "oTableTools": {
                     "aButtons": [
 				        "copy",

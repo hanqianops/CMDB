@@ -6,5 +6,5 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
-    url(r'^list/$', views.AssetList.as_view(), name='asset_list'),
+    url(r'^(?P<model_name>\w+)/$', views.AssetList.as_view(), name='list'),
 ]
