@@ -9,7 +9,7 @@ var ZeroClipboard_TableTools = {
 	nextId: 1, // ID of next movie
 	
 	$: function(thingy) {
-		// simple DOM lookup utility function
+		// simple DOM lookup plugins function
 		if (typeof(thingy) == 'string') thingy = document.getElementById(thingy);
 		if (!thingy.addClass) {
 			// extend element with a few useful methods

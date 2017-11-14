@@ -1,28 +1,64 @@
-# coding: utf-8
-__author__ = "HanQian"
-
-from django.forms import ModelForm, Textarea
+# # coding: utf-8
+# __author__ = "HanQian"
+#
+from django.forms import ModelForm, TextInput,Select,SelectMultiple,DateTimeInput
 from django.utils.translation import ugettext_lazy as _
-from django.core.exceptions import ValidationError
 from asset.models import *
 
+from django.utils.html import escape,format_html
+from django.utils.html import escape,format_html
+from django.utils.encoding import force_text
+from django.forms.utils import flatatt
 
-def validate_begins(value):
-    """自定义验证器"""
-    if not value.startswith(u'new'):
-        raise ValidationError(u'字符串必须是 `new` 开头')
 
+class DDD(Select):
+    def render(self, name, value, attrs=None):
+        print(name, value,']]]]]]]]]]]]]]]]]')
+        if value is None:
+            value = ''
+        # self.attrs.update({'class': '%s textinput' % self.attrs.get('class', '')})
+        # final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
+        # if value != '':
+        final_attrs={'class': 'form-control'}
+        templ = """
+        <select name="form-0-asset" class="form-control" id="id_form-0-asset">
+  <option value="">---------</option>
+
+  <option value="1">兆维aaaa机房-G-10-1</option>
+
+  <option value="2">兆维机房-G-10-2</option>
+
+  <option value="3">兆维机房-G-10-3</option>
+
+  <option value="4">兆维机房-G-10-4</option>
+
+  <option value="5">兆维机房-G-10-5</option>
+
+  <option value="6">兆维机房-G-10-6</option>
+
+  <option value="7">亦庄机房-B-10-6</option>
+
+  <option value="8">亦庄机房-B-10-5</option>
+
+  <option value="9">亦庄机房-B-10-4</option>
+
+  <option value="10">亦庄机房-B-10-3</option>
+
+  <option value="11">亦庄机房-B-10-2</option>
+
+  <option value="12" selected="">亦庄机房-B-10-1</option>
+
+  <option value="13">亦庄机房-F-20-22</option>
+
+</select>
+        """
+        html = format_html(templ, flatatt(final_attrs))
+        return html
 
 class ServerForm(ModelForm):
-    # 使用自定义的字段
-    # name = MyFormField(max_length=200, required=False, validators=[validate_slug]
-    # def __init__(self, *args, **kwargs):
-    #     print("执行顺序1：init")
-    #     # 自定义ModelForm中的field验证规则
-    #     super(AuthorForm, self).__init__(*args, **kwargs)
+    # def __init__(self,*args, **kwargs):
+    #     super(ServerForm, self).__init__(*args, **kwargs)
     #     self.fields['name'].required = True
-    #     self.fields['city'].validators.append(validate_begins)
-    #
     # def clean_name(self):
     #     """自定义验证方法"""
     #     print("执行顺序2：clean_name")
@@ -31,39 +67,51 @@ class ServerForm(ModelForm):
     #         return value
     #     else:
     #         raise ValidationError("你不是管理员！")
-    #
-    # def clean(self):
-    #     print("执行顺序3: name")
-    #     # 不符合需求的字段不会出现在cleaned_data中
-    #     cleaned_data = super(AuthorForm, self).clean()
-    #     password = cleaned_data.get('password', '')
-    #     password2 = cleaned_data.get('password2', '')
-    #     if password != password2:
-    #         raise forms.ValidationError("passwords not match")
-    #     return cleaned_data
 
     class Meta:
-        print("启动Django时就执行了")
         model = Server
-
-        fields = '__all__'  # 显示全部字段
-        # exclude = 'title'   # 排除某个字段
-        # fields = ['name', 'title', 'city', ]  # 决定显示哪些字段与显示顺序
-        # model中指定editable=False时，任何表单都不会包含该字段。
-        # labels = {'name': _('姓名'), }
+        fields = ('__all__')
+        labels = {'asset': _('机柜'), }
+        widgets = {
+            "asset": DDD(attrs={'class': 'form-control'}),
+            "name":TextInput(attrs={'class': 'form-control',}),
+            "inner_ip":TextInput(attrs={'class': 'form-control',}),
+            "management_ip":TextInput(attrs={'class': 'form-control',}),
+            "device_status":Select(attrs={'class': 'form-control'}),
+            "business_unit":Select(attrs={'class': 'form-control'}),
+            "server_type":Select(attrs={'class': 'form-control'}),
+            "upper_layer":Select(attrs={'class': 'form-control'}),
+            "switch":Select(attrs={'class': 'form-control'}),
+            "os_release": TextInput(attrs={'class': 'form-control', }),
+            "os_type": TextInput(attrs={'class': 'form-control', }),
+            "sn": TextInput(attrs={'class': 'form-control', }),
+            "os_type": TextInput(attrs={'class': 'form-control', }),
+            "device_type": Select(attrs={'class': 'form-control', }),
+            "server_attr": TextInput(attrs={'class': 'form-control', }),
+            "trade_date": DateTimeInput(attrs={'type':'date'}),
+            "expire_date": DateTimeInput(attrs={'type':'date'}),
+            "tags":SelectMultiple(attrs={'class': 'form-control'})
+        }
         # help_texts = {'name': _('Some useful help text.'), }
-        # error_messages = {
-        #     'name': {'required': _("This writer's name is too long."), },
-        #     'birth_date': {'required': _("时间不能为空"), },
-        # }
+        error_messages = {
+            'name': {'required': _("请填写主机名"),'unique':'主机名必须唯一' },
+            'sn': {'required': _("请填写SN"),'unique':'SN必须唯一' },
+            # 'birth_date': {'required': _("时间不能为空"), },
+        }
 
-
-# 与上边具有相同的功能，只是save()方法不同
-# from django import forms
-#
-#
-# class AuthorForm(forms.Form):
-#     name = forms.CharField(max_length=100)
-#     title = forms.CharField(max_length=3,
-#                             widget=forms.Select(choices=TITLE_CHOICES))
-#     birth_date = forms.DateField(required=False)
+from django.forms.models import modelformset_factory
+EditSeverFormSet = modelformset_factory(
+            Server,  # model模型
+            fields=('id','name', 'asset', 'device_status', 'server_type', 'upper_layer', 'switch'),
+            max_num=1,  # 控制额外表单的显示数量，不会限制已经存在的表单对像的显示
+            extra=1,  # 如果 max_num大于存在的关联对像的数量，表单集将添加 extra个额外的空白表单, 但表单总量不会超过 max_num 个
+            widgets={
+                "name": TextInput(attrs={'class': 'form-control', 'readonly': ''}),
+                "asset": Select(attrs={'class': 'form-control'}),
+                "device_status": Select(attrs={'class': 'form-control'}),
+                "server_type": Select(attrs={'class': 'form-control'}),
+                "upper_layer": Select(attrs={'class': 'form-control'}),
+                "switch": Select(attrs={'class': 'form-control'}),
+                "tags": SelectMultiple(attrs={'class': 'form-control'})
+            }
+        )

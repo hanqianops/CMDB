@@ -1,0 +1,68 @@
+{% extends "asset/base.html" %}
+{% load asset_tags %}
+{% block page_breadcrumbs %}
+    <li class="active">资产列表</li>
+{% endblock %}
+{% block body %}
+    <div class="page-body">
+        <div class="row">
+            <div class="col-xs-12 col-md-12">
+                <div class="widget">
+                    <div class="widget-header ">
+                        <span class="widget-caption">创建信息</span>
+                        <div class="widget-buttons">
+                            <a href="#" data-toggle="maximize">
+                                <i class="fa fa-expand"></i>
+                            </a>
+                            <a href="#" data-toggle="collapse">
+                                <i class="fa fa-minus"></i>
+                            </a>
+                            <a href="#" data-toggle="dispose">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <form id="iFormCreate" class="form-horizontal" method="post" novalidate>
+                            <input type="hidden" name="__next__" value="{{ i__next__ }}">
+                            {% csrf_token %}
+                            {% for obj in form %}
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-2 control-label">{{ obj.label }}</label>
+                                    <div class="col-sm-5">
+                                        <span style="color: red">{{ obj.errors.0 }}</span>
+                                        {{ obj }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            <h5 class="page-header"></h5>
+                            <div class="form-group">
+                                <div class="col-sm-4 col-sm-offset-3">
+                                    <a href="{{ i__next__ }}" class="btn btn-white">取消</a>
+                                </div>
+                                <div class="col-sm-4">
+                                    <button type="submit" class="btn btn-primary">保存</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block js %}
+    <script>
+        $(function () {
+            $('[required]').each(function (i, v) {
+                console.log($(v).val())
+                var val = $(v).val();
+                var tag = '<span style="color: red">* </span>'
+                $(v).parent().prev().prepend(tag)
+            })
+        })
+
+
+    </script>
+{% endblock %}

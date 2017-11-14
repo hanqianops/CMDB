@@ -84,6 +84,7 @@ class NewAssetApprovalZoneAdmin(admin.ModelAdmin):
 admin.site.register(models.IDC, IDCAdmin)
 # admin.site.register(models.Asset,AssetAdmin)
 admin.site.register(models.Server)
+admin.site.register(models.Device_Status)
 admin.site.register(models.Cpu)
 admin.site.register(models.Disk)
 admin.site.register(models.Nic)

@@ -30,14 +30,8 @@ class Asset(BaseTimeField):
     """
     idc = models.ForeignKey(verbose_name='IDC机房', to='IDC')
     device_type_choices = ((1, '服务器'), (2, '交换机'), (3, '防火墙'),)
-    device_status_choices = ((0, '在线'), (1, '已下线'), (2, '未知'), (3, '故障'), (4, '备用'),)
-
     device_type_id = models.IntegerField(choices=device_type_choices, default=1)
-    device_status_id = models.IntegerField(choices=device_status_choices, default=1)
-
     cabinet_num = models.CharField('机柜位', max_length=30, null=True, blank=True)
-    business_unit = models.ForeignKey('BusinessUnit', verbose_name='属于的业务线', null=True, blank=True)
-
     tag = models.ManyToManyField(to='Tag', blank=True, default=1)
 
     class Meta:
@@ -51,10 +45,12 @@ class Asset(BaseTimeField):
 class Server(BaseTimeField):
     """服务器设备"""
     asset = models.OneToOneField(verbose_name=u'资产',to='Asset', null=True, blank=True)
-    name = models.CharField(verbose_name=u'主机名',max_length=128, unique=True)
+    name = models.CharField(verbose_name=u'主机名',max_length=18, unique=True)
     inner_ip = models.GenericIPAddressField(verbose_name=u'内网IP', blank=True, null=True)
     management_ip = models.GenericIPAddressField(verbose_name=u'管理IP', blank=True, null=True)
-
+    business_unit = models.ForeignKey('BusinessUnit', verbose_name='属于的业务线', null=True, blank=True)
+    device_status_choices = ((0, '在线'), (1, '已下线'), (2, '未知'), (3, '故障'), (4, '备用'),)
+    device_status = models.IntegerField(verbose_name="状态",choices=device_status_choices, default=1)
     server_type_choices = ((0, '物理服务器'), (1, '宿主机'),(2, '虚拟机'),)
     server_type = models.SmallIntegerField(verbose_name="服务器类型", choices=server_type_choices, default=0)
     upper_layer = models.ForeignKey(verbose_name='所属宿主机',to='self', related_name='upperlayer', blank=True, null=True)  # v1/v2/v3
@@ -77,6 +73,14 @@ class Server(BaseTimeField):
     def __str__(self):
         return self.name
 
+class Device_Status(models.Model):
+    status = models.CharField(max_length=30)
+
+    class Meta:
+        verbose_name = '设备状态'
+        verbose_name_plural = "设备状态"
+    def __str__(self):
+        return self.status
 
 class NetworkDevice(BaseTimeField):
     """网络设备"""
@@ -158,7 +162,7 @@ class Disk(BaseTimeField):
         verbose_name_plural = "硬盘"
 
     def __str__(self):
-        return '%s:slot:%s capacity:%s' % (self.server_name, self.slot, self.capacity)
+        return '%s-%s-%s' % (self.server.name, self.slot, self.capacity)
 
 
 

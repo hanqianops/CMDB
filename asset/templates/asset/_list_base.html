@@ -4,7 +4,6 @@
     <li class="active">资产列表</li>
 {% endblock %}
 {% block body %}
-    <!-- Page Body -->
     <div class="page-body">
         <div id="divdelay"
              style="z-index:9999;left:40%;top:10%;width: 20%; display: none;position: fixed;">
@@ -13,8 +12,6 @@
                 删除成功
             </p>
         </div>
-        <div class="row">
-            <div class="col-xs-12 col-md-12">
                 <div class="widget">
                     <div class="widget-header ">
                         <span class="widget-caption">资产信息</span>
@@ -60,36 +57,32 @@
                                         <li class="divider"></li>
                                     </ul>
                                 </div>
-{#                                <div class="btn-group">#}
-{#                                    <a id="statusButton" class="btn btn-default "#}
-{#                                       href="javascript:void(0);"></a>#}
-{#                                    <a class="btn btn-default  dropdown-toggle" data-toggle="dropdown"#}
-{#                                       href="javascript:void(0);"><i class="fa fa-angle-down"></i></a>#}
-{#                                    <ul class="dropdown-menu dropdown-inverse">#}
-{#                                        {% status model_name request %}#}
-{#                                        <li class="divider"></li>#}
-{#                                    </ul>#}
-{#                                    <a id="statusSub" class="hide"></a>#}
-{##}
-{#                                </div>#}
+                                <div class="btn-group">
+                                    <a id="statusButton" class="btn btn-default "
+                                       href="javascript:void(0);"></a>
+                                    <a class="btn btn-default  dropdown-toggle" data-toggle="dropdown"
+                                       href="javascript:void(0);"><i class="fa fa-angle-down"></i></a>
+                                    <ul class="dropdown-menu dropdown-inverse">
+                                        {% status model_name request %}
+                                        <li class="divider"></li>
+                                    </ul>
+                                    <a id="statusSub" class="hide"></a>
+
+                                </div>
                             </div>
 
 
-                            <div id="editabledatatable_filter" class="dataTables_filter">
+                            <div class="dataTables_filter">
                                 <label>
-                                    <input type="search" class="form-control input-sm"
-                                           aria-controls="editabledatatable">
+                                    <input type="search" class="form-control input-sm" aria-controls="editabledatatable">
                                 </label>
                                 <a id="searchSub" class="hide"></a>
                             </div>
 
-
-                            <div class="dataTables_length" id="editabledatatable_length">
+                            <div class="dataTables_length" >
                                 <label>
-                                    <select id="page" onchange='ChangePageSelect()' name="editabledatatable_length"
-                                            aria-controls="editabledatatable"
-                                            class="form-control input-sm">
-                                        <option value="2">2</option>
+                                    <select id="page" onchange='ChangePageSelect()' class="form-control input-sm">
+                                    <option value="2">2</option>
                                         <option value="3">3</option>
                                         <option value="4">4</option>
                                         <option value="10">10</option>
@@ -168,8 +161,6 @@
                         <!--模态框结束-->
                     </div>
                 </div>
-            </div>
-        </div>
     </div>
 {% endblock %}
 

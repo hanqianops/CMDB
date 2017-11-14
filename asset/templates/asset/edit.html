@@ -1,0 +1,67 @@
+{% extends "asset/base.html" %}
+{% load asset_tags %}
+{% block page_breadcrumbs %}
+    <li class="active" xmlns="http://www.w3.org/1999/html">资产列表</li>
+{% endblock %}
+{% block body %}
+    <div class="page-body">
+        <div class="row">
+            <div class="col-xs-12 col-md-12">
+                <div class="widget">
+                    <div class="widget-header ">
+                        <span class="widget-caption">创建信息</span>
+                        <div class="widget-buttons">
+                            <a href="#" data-toggle="maximize">
+                                <i class="fa fa-expand"></i>
+                            </a>
+                            <a href="#" data-toggle="collapse">
+                                <i class="fa fa-minus"></i>
+                            </a>
+                            <a href="#" data-toggle="dispose">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+
+                        <form method="post" action="">
+                            {% csrf_token %}
+                            {{ formset.management_form }}
+                            <table class="table table-striped table-bordered ">
+                                <tr>
+                                    {% for field_name in formset.0 %}
+                                        <th>{{ field_name.label }}</th>
+                                    {% endfor %}
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for row in formset %}
+                                    <tr>
+                                        {% for field in row %}
+                                            <td>
+                                                <span style="color: red">{{ field.errors.0 }}</span>
+                                                {{ field }}
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            <div class="row" style="margin: 10px">
+
+                                <div class="col-sm-2 col-sm-offset-4">
+                                    <a href="{{ url }}" class="btn ">取消</a>
+                                </div>
+                                <div class="col-sm-2">
+                                    <button type="submit" class="btn ">保存</button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
