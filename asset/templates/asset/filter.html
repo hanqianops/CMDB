@@ -1,0 +1,39 @@
+{% load asset_tags %}
+<div role="grid" class="dataTables_wrapper">
+    <div class="DTTT btn-group">
+        <div class="btn-group">
+            <a id="projectButton" class="btn btn-default "
+               href="javascript:void(0);"></a>
+            <a class="btn btn-default  dropdown-toggle" data-toggle="dropdown"
+               href="javascript:void(0);"><i class="fa fa-angle-down"></i></a>
+            <ul class="dropdown-menu dropdown-inverse">
+
+                {% project request %}
+                <li class="divider"></li>
+            </ul>
+        </div>
+        <div class="btn-group">
+            <a id="moduleButton" class="btn btn-default "
+               href="javascript:void(0);"></a>
+            <a class="btn btn-default  dropdown-toggle" data-toggle="dropdown"
+               href="javascript:void(0);"><i class="fa fa-angle-down"></i></a>
+            <ul class="dropdown-menu dropdown-inverse">
+                {% module request %}
+                <li class="divider"></li>
+            </ul>
+        </div>
+        <div class="btn-group">
+            <a id="statusButton" class="btn btn-default "
+               href="javascript:void(0);"></a>
+            <a class="btn btn-default  dropdown-toggle" data-toggle="dropdown"
+               href="javascript:void(0);"><i class="fa fa-angle-down"></i></a>
+            <ul class="dropdown-menu dropdown-inverse">
+                {% status model_name request %}
+                <li class="divider"></li>
+            </ul>
+            <a id="statusSub" class="hide"></a>
+
+        </div>
+    </div>
+</div>
+

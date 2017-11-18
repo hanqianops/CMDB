@@ -1,8 +1,6 @@
 {% extends "asset/base.html" %}
 {% load asset_tags %}
-{% block page_breadcrumbs %}
-    <li class="active">资产列表</li>
-{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 {% block body %}
     <!-- Page Body -->
     <div class="page-body">
@@ -17,7 +15,7 @@
             <div class="col-xs-12 col-md-12">
                 <div class="widget">
                     <div class="widget-header ">
-                        <span class="widget-caption">资产信息</span>
+                        <span class="widget-caption">{{ title }}信息</span>
                         <div class="widget-buttons">
                             <a href="#" data-toggle="maximize">
                                 <i class="fa fa-expand"></i>
@@ -32,118 +30,95 @@
                     </div>
                     <div class="widget-body">
                         <div class="table-toolbar">
-                            <a id="add" href="{% url 'asset:add' model_name=model_name %}" class="btn"> 新增主机</a>
-                            <a id="edit" href="javascript:void(0);" class="btn"> 编辑主机</a>
-                            <a id ="editSub" class="hide"></a>
+                            <a id="add" href="{% url 'asset:add' model_name=model_name %}" class="btn"> 新增</a>
+                            <a id="edit" href="javascript:void(0);" class="btn"> 批量编辑</a>
+                            <a id="editSub" class="hide"></a>
                         </div>
-                        <div role="grid" class="dataTables_wrapper form-inline no-footer">
-                            <div class="DTTT btn-group">
-                                <a href="?" class="btn btn-default">重置</a>
-                                <div class="btn-group">
-                                    <a id="projectButton" class="btn btn-default "
-                                       href="javascript:void(0);"></a>
-                                    <a class="btn btn-default  dropdown-toggle" data-toggle="dropdown"
-                                       href="javascript:void(0);"><i class="fa fa-angle-down"></i></a>
-                                    <ul class="dropdown-menu dropdown-inverse">
+                        {% if model_name == 'server' %}
+                            {% include 'asset/filter.html' %}
+                        {% endif %}
 
-                                        {% project request %}
-                                        <li class="divider"></li>
+                        {% if admin_class.search_fields %}
+                            <div role="grid" class="dataTables_wrapper">
+                                <div class="dataTables_length">
+                                    <a href="?" class="btn btn-default">重置</a>
+                                </div>
+
+                                <div class="dataTables_filter">
+                                    <label>
+                                        <input type="search" class="form-control input-sm"
+                                               aria-controls="editabledatatable">
+                                    </label>
+                                    <a id="searchSub" class="hide"></a>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <table class="table table-striped table-bordered table-hover">
+                            {% if object_list %}
+                                <thead>
+                                <tr>
+                                    <th onclick="SelectAll()">
+                                        <label>
+                                            <input type="checkbox">
+                                            <span class="text"></span>
+                                        </label>
+                                    </th>
+                                    {% thead model_name %}
+                                    <th>操作</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for row in object_list %}
+                                    <tr id="{{ row.id }}">
+                                        <td><label><input type="checkbox"><span class="text"></span></label></td>
+                                            {% tbody_tr row admin_class.list_display %}
+                                        <td>
+                                            <a href="{{ row.id }}/"> 详细信息 |</a>
+                                            <a href='javascript:void(0)' onclick='modalObj({{ row.id }});'> 删除</a>
+                                        </td>
+                                    </tr>
+
+                                {% endfor %}
+                                {#                                {% tbody model_name object_list page_obj %}#}
+                                </tbody>
+                            {% else %}
+                                <tbody>
+                                <tr>
+                                    <td>没有符合条件的数据</td>
+                                </tr>
+                                </tbody>
+                            {% endif %}
+                        </table>
+
+                        <!-- 分页-->
+                        <div class="row DTTTFooter">
+                            <div class="col-sm-6">
+                                <div class="dataTables_info">
+                                    <label>
+                                        <select id="page" onchange='ChangePageSelect()'
+                                                class="form-control input-sm">
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="10">10</option>
+                                            <option value="-1">All</option>
+                                        </select>
+                                        <a id="pageSub" class="hide"></a>
+                                    </label>
+                                    第{{ page_info.current_page }}页，共{{ page_info.all_page }}页
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="dataTables_paginate paging_bootstrap" id="simpledatatable_paginate">
+                                    <ul class="pagination">
+                                        {{ page_info.page_str|safe }}
                                     </ul>
                                 </div>
-                                <div class="btn-group">
-                                    <a id="moduleButton" class="btn btn-default "
-                                       href="javascript:void(0);"></a>
-                                    <a class="btn btn-default  dropdown-toggle" data-toggle="dropdown"
-                                       href="javascript:void(0);"><i class="fa fa-angle-down"></i></a>
-                                    <ul class="dropdown-menu dropdown-inverse">
-                                        {% module request %}
-                                        <li class="divider"></li>
-                                    </ul>
-                                </div>
-{#                                <div class="btn-group">#}
-{#                                    <a id="statusButton" class="btn btn-default "#}
-{#                                       href="javascript:void(0);"></a>#}
-{#                                    <a class="btn btn-default  dropdown-toggle" data-toggle="dropdown"#}
-{#                                       href="javascript:void(0);"><i class="fa fa-angle-down"></i></a>#}
-{#                                    <ul class="dropdown-menu dropdown-inverse">#}
-{#                                        {% status model_name request %}#}
-{#                                        <li class="divider"></li>#}
-{#                                    </ul>#}
-{#                                    <a id="statusSub" class="hide"></a>#}
-{##}
-{#                                </div>#}
                             </div>
-
-
-                            <div id="editabledatatable_filter" class="dataTables_filter">
-                                <label>
-                                    <input type="search" class="form-control input-sm"
-                                           aria-controls="editabledatatable">
-                                </label>
-                                <a id="searchSub" class="hide"></a>
-                            </div>
-
-
-                            <div class="dataTables_length" id="editabledatatable_length">
-                                <label>
-                                    <select id="page" onchange='ChangePageSelect()' name="editabledatatable_length"
-                                            aria-controls="editabledatatable"
-                                            class="form-control input-sm">
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="10">10</option>
-                                        <option value="-1">All</option>
-                                    </select>
-                                    <a id="pageSub" class="hide"></a>
-
-                                </label>
-                            </div>
-                            <table class="table table-striped table-bordered table-hover">
-                                {% if object_list %}
-                                    <thead>
-                                    <tr>
-                                        <th onclick="SelectAll()">
-                                            <label>
-                                                <input type="checkbox">
-                                                <span class="text"></span>
-                                            </label>
-                                        </th>
-                                        <th>ID</th>
-                                        {% thead model_name object_list.0 %}
-                                    </tr>
-                                    </thead>
-
-                                    <tbody>
-                                    {% tbody model_name object_list page_obj %}
-                                    </tbody>
-                                {% else %}
-                                    <tbody>
-                                    <tr>
-                                        <td>没有符合条件的主机</td>
-                                    </tr>
-                                    </tbody>
-                                {% endif %}
-
-                            </table>
-                            <!-- Page -->
-                            <div class="row DTTTFooter">
-                                <div class="col-sm-6">
-                                    <div class="dataTables_info" id="simpledatatable_info" role="alert"
-                                         aria-live="polite" aria-relevant="all">第{{ page_info.current_page }}页
-                                        ，共{{ page_info.all_page }}页
-                                    </div>
-                                </div>
-                                <div class="col-sm-6">
-                                    <div class="dataTables_paginate paging_bootstrap" id="simpledatatable_paginate">
-                                        <ul class="pagination">
-                                            {{ page_info.page_str|safe }}
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- /Page -->
                         </div>
+                        <!-- /分页 -->
+
                         <!--模态框-->
                         <div class="modal" id="deleteModal" aria-hidden="false" tabindex="-1">
                             <div class="modal-dialog" role="document">
@@ -182,13 +157,13 @@
             Search();
             ChangeSelect();
         });
-
         $('#edit').click(function () {
             /*编辑按钮*/
             var aID = new Array
             $(":checkbox:checked").closest("tr").each(function (i, tr) {
-                var val = tr.children[1].innerText
-                if (val != "ID") {
+{#                var val = tr.children[1].innerText#}  // 需要ID列
+                var val = tr.getAttribute("id")
+                if (val != "") {
                     aID.push(val)
                 }
             })
@@ -196,13 +171,11 @@
                 $('#editSub').attr("href", 'edit/?id=' + aID.join(','))
                 $('#editSub')[0].click()
             }
-
         })
         function SelectAll() {
             /*复选框*/
             $("input[type='checkbox']").prop("checked") ? $("input[type='checkbox']").prop("checked", false) : $("input[type='checkbox']").prop("checked", true);
         }
-
         function modalObj(val) {
             /*修改模态框数据*/
             $.ajax({
@@ -216,7 +189,6 @@
                         $('#deleteobj').attr('onclick', 'deleteObj(' + data.id + ');')
                         $('#deleteModal').modal('show')
                     }
-
                 }
             })
         }
@@ -231,12 +203,9 @@
                     $('#divdelay').css('display', 'block')
                     data.status ? $('#divdelaytext').text('删除成功') : $('#divdelaytext').text('删除失败')
                     window.setTimeout("$('#divdelay').css('display','none')", 2000)
-
                 }
-
             })
         }
-
         function ClickProjectModule() {
             /*点击业务按钮的事件*/
             $("ul li").click(function () {
@@ -246,7 +215,6 @@
                 if (objID == 'projectButton') {
                     $.cookie("project", obj)
                     $.cookie("module", '全部模块')
-
                 } else if (objID == 'moduleButton') {
                     $.cookie("module", obj)
                 } else if (objID == 'statusButton') {
@@ -260,7 +228,6 @@
             $.cookie("module") ? $("#moduleButton").text($.cookie("module")) : $("#moduleButton").text("全部模块")
             $.cookie("status") ? $("#statusButton").text($.cookie("status")) : $("#statusButton").text("全部状态")
         }
-
         function GetParameter(parameter, val) {
             /*处理请求参数,组合成新的请求参数*/
             var aCurrentParameter = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&')
@@ -274,7 +241,6 @@
             var aSendParameter = aSendParameter.join('&')
             return aSendParameter // project_id=1&page=2&module=3
         }
-
         function FilterStatus(id) {
             url = GetParameter('status', id)
             $("#statusSub").attr("href", '?' + url)
@@ -286,13 +252,11 @@
                 if (e.keyCode == 13) {
                     var searchText = $("[type='search']").val();
                     url = GetParameter('search', searchText)
-
                     $("#searchSub").attr("href", '?' + url)
                     $("#searchSub")[0].click()
                 }
             })
         }
-
         function ChangePageSelect() {
             /*分页*/
             var page_val = "?" + "page_num=" + $("#page").val()
@@ -305,6 +269,5 @@
             var temp_val = "#page option[value=" + {{ page_info.per_page_num }} +"]"
             $(temp_val).attr("selected", true)
         }
-
     </script>
 {% endblock %}

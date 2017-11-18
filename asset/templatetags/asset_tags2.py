@@ -11,89 +11,57 @@ print(site.apps['asset']['server'].model.device_status_choices, "==00000==")
 register = template.Library()  # register变量名是固定点
 
 
-def get_verbose_name(model_name,field_name=None):
-    """获取model字段的verbose_name属性"""
-    model = site.apps['asset'][model_name].model
-    dic = {}
-    for field_obj in model._meta.fields:
-        dic.setdefault(field_obj.name,field_obj.verbose_name)
-    if field_name:
-        return dic[field_name]
-    return dic
+@register.filter(is_safe=True)  # 只能接受两个参数
+def filter_multi(var, bar):  # var是变量值， bar是选项值
+    return var * bar  # {{ value|filter_multi:3 }}
+
+
+
 
 @register.simple_tag
 def thead(model_name,):
     list_display = site.apps['asset'][model_name].list_display
-    dic = get_verbose_name(model_name)
     html_str = ""
-    for display_name in list_display:
-        field = display_name.split('.')
-        if len(field) == 1:
-            html_str += "<th>{0}</th>".format(dic.get(display_name))
-        else:
-            html_str += "<th>{0}</th>".format(get_verbose_name(*field))
-
+    for _,display_name in list_display:
+        html_str += "<th>{0}</th>".format(display_name)
     return mark_safe(html_str)
 
 
-def get_field(obj,field):
-    """
-    获取对象的指定熟悉
-    :param obj:  可以是一行数据对象也可以是一个字段对象
-    """
-    if obj._meta.get_field(field).choices:
-        f = 'get_{0}_display'.format(field)
-        tr_str = "<td>{0}</td>".format(getattr(obj, f)())
-    else:
-        tr_str = "<td>{0}</td>".format(getattr(obj, field))
-    return tr_str
-
-
-
 @register.simple_tag
-def tbody_tr(row,list_display):
-    tr_str = ""
-    for display_field in list_display:
-        field = display_field.split('.')
-        if len(field) == 1:
-            tr_str += get_field(row,display_field)
-        else:
+def tbody(model_name, obj_list, page_obj):
+    list_display = site.apps['asset'][model_name].list_display
+    html_str = ""
+    for row in obj_list:
+        tr_str = """<tr>
+                        <td><label><input type="checkbox" ><span class="text"></span></label></td>
+                        <td>{0}</td>
+                        """.format(row.id)
+        for display_field,_ in list_display:
+            field = display_field.split('.')
             try:
                 field_obj = getattr(row, field[0])
-                tr_str += get_field(field_obj,field[1])
+                if len(field) == 1:
+                    if row._meta.get_field(field[0]).choices:
+                        f = 'get_{0}_display'.format(field[0])
+                        tr_str += "<td>{0}</td>".format(getattr(row, f)())
+                    else:
+                        tr_str += "<td>{0}</td>".format(getattr(row, field[0]))
+                else:
+
+                    if field_obj._meta.get_field(field[1]).choices:
+                        f = 'get_{0}_display'.format(field[1])
+                        tr_str += "<td>{0}</td>".format(getattr(field_obj,f)())
+                    else:
+                        tr_str += "<td>{0}</td>".format(getattr(field_obj, field[1]))
             except Exception as e:
                 tr_str += "<td></td>"
-        print(tr_str,'==========================')
-    return mark_safe(tr_str)
 
-
-
-
-# @register.simple_tag
-# def tbody(model_name, obj_list, page_obj):
-#     list_display = site.apps['asset'][model_name].list_display
-#     html_str = ""
-#     for row in obj_list:
-#         tr_str = """<tr>
-#                         <td><label><input type="checkbox" ><span class="text"></span></label></td>
-#                         <td>{0}</td>
-#                         """.format(row.id)
-#         for display_field in list_display:
-#             field = display_field.split('.')
-#             if len(field) == 1:
-#                 tr_str += get_field(row,display_field)
-#             else:
-#                 try:
-#                     field_obj = getattr(row, field[0])
-#                     tr_str += get_field(field_obj,field[1])
-#                 except Exception as e:
-#                     tr_str += "<td></td>"
-#         tr_str += """<td>
-#                     <a href="{id}/" > 详细信息 |</a>
-#                     <a href='javascript:void(0)' onclick='modalObj({id});'> 删除</button>
-#                     </td></tr>""".format(**{"id":row.id,"row":row})
-#         html_str += tr_str
-#     return mark_safe(html_str)
+        tr_str += """<td>
+                    <a href="{id}/" > 详细信息 |</a>
+                    <a href='javascript:void(0)' onclick='modalObj({id});'> 删除</button>
+                    </td></tr>""".format(**{"id":row.id,"row":row})
+        html_str += tr_str
+    return mark_safe(html_str)
 
 @register.assignment_tag
 def ff():
@@ -158,22 +126,3 @@ def status(model_name,request):
         html_status += "<li><a onclick='FilterStatus({0})'>{1}</a></li>".format(id,name)
         print(id,name)
     return mark_safe(html_status)
-
-
-
-@register.simple_tag
-def detail(object):
-    fields = object._meta.fields
-    t = ""
-    for field_obj in fields:
-        tr = "<tr><td>{0}</td>".format(field_obj.verbose_name)
-        if field_obj.get_internal_type() == 'DateTimeField':
-            temp = getattr(object,field_obj.name)
-            tr += "<td>{0}</td></tr>".format(temp.strftime("%Y-%m-%d %H:%M:%S"))
-        else:
-            tr += "<td>{0}</td></tr>".format(getattr(object,field_obj.name))
-        t += tr
-    return mark_safe(t)
-
-
-

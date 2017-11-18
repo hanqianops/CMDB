@@ -1,20 +1,19 @@
 # coding: utf-8
 __author__ = "HanQian"
 
-class BaseConfig(object):
+class BaseAdmin(object):
 
     list_display = ()
     list_filter = ()
     search_fields = ()
-    list_per_page = 5
-    actions = ()
+    list_editable = ()
     readonly_fields = ()
 
 class AdminSite(object):
     def __init__(self):
         self.apps = {}
 
-    def register(self, model_obj,admin_class=BaseConfig, **options):
+    def register(self, model_obj,admin_class=BaseAdmin, **options):
         """
         负责把每个App下的表加载到self.apps里
         """

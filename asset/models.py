@@ -2,8 +2,8 @@ from django.db import models
 
 
 class BaseTimeField(models.Model):
-    create_date = models.DateTimeField(blank=True, auto_now_add=True)  # 创建时间
-    update_date = models.DateTimeField(blank=True, auto_now=True)  # 更新时间
+    create_date = models.DateTimeField(verbose_name="创建时间", blank=True, auto_now_add=True)  # 创建时间
+    update_date = models.DateTimeField(verbose_name="更新时间", blank=True, auto_now=True)  # 更新时间
 
     class Meta:
         abstract = True
@@ -24,18 +24,18 @@ class IDC(models.Model):
         verbose_name_plural = "IDC机房"
 
 
-class Asset(BaseTimeField):
+class Cabinet(BaseTimeField):
     """
     资产信息表
     """
     idc = models.ForeignKey(verbose_name='IDC机房', to='IDC')
     device_type_choices = ((1, '服务器'), (2, '交换机'), (3, '防火墙'),)
-    device_type_id = models.IntegerField(choices=device_type_choices, default=1)
+    device_type_id = models.IntegerField(verbose_name="设备类型",choices=device_type_choices, default=1)
     cabinet_num = models.CharField('机柜位', max_length=30, null=True, blank=True)
-    tag = models.ManyToManyField(to='Tag', blank=True, default=1)
+    memo = models.TextField(verbose_name=u'备注', max_length=128, blank=True, null=True)
 
     class Meta:
-        verbose_name_plural = "资产表"
+        verbose_name_plural = "机柜信息"
 
     def __str__(self):
         return "%s-%s" % (self.idc.name, self.cabinet_num)
@@ -44,7 +44,7 @@ class Asset(BaseTimeField):
 
 class Server(BaseTimeField):
     """服务器设备"""
-    asset = models.OneToOneField(verbose_name=u'资产',to='Asset', null=True, blank=True)
+    cabinet = models.OneToOneField(verbose_name=u'机柜信息',to='Cabinet', null=True, blank=True)
     name = models.CharField(verbose_name=u'主机名',max_length=18, unique=True)
     inner_ip = models.GenericIPAddressField(verbose_name=u'内网IP', blank=True, null=True)
     management_ip = models.GenericIPAddressField(verbose_name=u'管理IP', blank=True, null=True)
@@ -73,20 +73,12 @@ class Server(BaseTimeField):
     def __str__(self):
         return self.name
 
-class Device_Status(models.Model):
-    status = models.CharField(max_length=30)
-
-    class Meta:
-        verbose_name = '设备状态'
-        verbose_name_plural = "设备状态"
-    def __str__(self):
-        return self.status
 
 class NetworkDevice(BaseTimeField):
     """网络设备"""
 
-    asset = models.OneToOneField(verbose_name=u'资产', to='Asset', null=True, blank=True)
-    name = models.CharField(max_length=64, unique=True)
+    cabinet = models.OneToOneField(verbose_name=u'机柜信息', to='Cabinet', null=True, blank=True)
+    name = models.CharField(verbose_name="设备名称",max_length=64, unique=True)
     vlan_ip = models.GenericIPAddressField(verbose_name=u'VlanIP', blank=True, null=True)
     intranet_ip = models.GenericIPAddressField(verbose_name=u'管理IP', blank=True, null=True)
     manufactory = models.CharField(verbose_name=u'厂商',max_length=128,null=True, blank=True)

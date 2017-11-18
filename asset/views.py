@@ -1,44 +1,44 @@
 from django.shortcuts import render
 
+
 # Create your views here.
 
 def index(request):
-    return render(request, "asset/aaa.html")
+    return render(request, "asset/index.html")
 
 
 import json
 from asset import models
-from django.views.generic.edit import FormView
 from django.views.generic import View
 from django.views.generic import ListView
 from django.views.generic import DetailView
-from django.views.generic import DeleteView
-from django.views.generic import UpdateView
-from django.views.generic import CreateView
-from django.views.generic import FormView
+from django.urls import reverse
 from django.db.models import Q
 from asset.app_config import site
 from asset.plugins.page import PageInfo
 from django.http import HttpResponse, HttpResponseRedirect
-from asset import forms
-from django.forms.models import modelformset_factory
-from asset.forms import EditSeverFormSet,ServerForm
+from asset.forms import create_modelform, create_modelformset
 
 print(site.apps['asset']['server'].list_display)
 
+
 class Before(object):
     def dispatch(self, request, *args, **kwargs):
-        self.model = site.apps['asset'][self.kwargs['model_name']].model
-        # print(self.model.model)
-        print(self.kwargs['model_name'])
-        print("session对象",request.session.__dict__,)
-        print("COOKIES对象",request.COOKIES)
-        print("请求的路径",request.path_info)
+        self.model_name = self.kwargs['model_name']
+        self.admin_class = site.apps['asset'][self.model_name]
+        self.model = site.apps['asset'][self.model_name].model
+        self.title = self.model._meta.verbose_name
+        self.last_url = request.META.get('HTTP_REFERER')
+        print("session对象", request.session.__dict__, )
+        print("COOKIES对象", request.COOKIES)
+        print("请求的路径", request.path_info)
         obj = super(Before, self).dispatch(request, *args, **kwargs)
         return obj
 
+
+
 class FilterSearch(object):
-    def __init__(self,request):
+    def __init__(self, request):
         self.request = request
 
     def _search_field(self):
@@ -54,10 +54,8 @@ class FilterSearch(object):
         status_id = self.request.GET.get("status")
         status_obj = Q()
         if status_id:
-            status_obj.children.append(('device_status',status_id))
+            status_obj.children.append(('device_status', status_id))
         return status_obj
-
-
 
     def project_module_list(self):
         project_id = self.request.GET.get("project_id")
@@ -68,25 +66,25 @@ class FilterSearch(object):
         elif project_id:
             obj.connector = 'OR'
             obj.children.append(('business_unit__parent_unit_id', project_id))
-            obj.children.append(('business_unit_id', project_id)) # 还没二级分组的情况
+            obj.children.append(('business_unit_id', project_id))  # 还没二级分组的情况
 
-        obj.add(self._search_field(),"AND")
-        obj.add(self._status_field(),"AND")
+        obj.add(self._search_field(), "AND")
+        obj.add(self._status_field(), "AND")
         return obj
 
 
-class AssetList(Before,ListView):
+class AssetList(Before, ListView):
     template_name = "asset/asset_list.html"
 
     def get_queryset(self):
         obj = FilterSearch(self.request)
-        print("===",obj.project_module_list())
         obj_list = self.model.objects.filter(obj.project_module_list())
         current_page = self.request.GET.get("page")
+
         self.page_info = PageInfo(
-            self.request,obj_list,
+            self.request, obj_list,
             current_page,
-            per_page_num= self.request.GET.get("page_num") or 10
+            per_page_num=self.request.GET.get("page_num") or 10
         )
         obj_list = obj_list[self.page_info.start:self.page_info.end]
         return obj_list
@@ -95,22 +93,29 @@ class AssetList(Before,ListView):
         context = super(AssetList, self).get_context_data(**kwargs)
         context['model_name'] = self.kwargs['model_name']
         context['page_info'] = self.page_info
+        context['title'] = self.title
+        context['admin_class'] = self.admin_class
         return context
 
 
-class AssetDetail(DetailView):
-    model = models.Server
-    template_name = 'asset/asset_detail.html'  # 模板
-    pk_url_kwarg = 'id'  # PublisherDetail.objects.filter(pk=user_id)
+class AssetDetail(Before,DetailView):
+
+    def get(self, request, *args, **kwargs):
+        object = self.model.objects.get(id=kwargs['id'])
+        model_name=self.model_name
+        return render(request,'asset/asset_detail.html',locals())
+
+
 
 class AssetDelete(View):
     def post(self, request, *args, **kwargs):
         # return HttpResponseRedirect('/asset/server')
         dic = {"status": False}
         return HttpResponse(json.dumps(dic))
-    def get(self,request,model_name,pk):
+
+    def get(self, request, model_name, pk):
         dic = {"status": True}
-        object = models.Server.objects.filter(id=pk).values('name','id')
+        object = models.Server.objects.filter(id=pk).values('name', 'id')
         if object:
             dic.update(object[0])
         else:
@@ -118,58 +123,43 @@ class AssetDelete(View):
         print(json.dumps(dic))
         return HttpResponse(json.dumps(dic))
 
-class AssetCreate(View):
-    def get(self,request,model_name):
-        q = models.Server.objects.filter(id__gt=8)
-        form = ServerForm()
+
+class AssetCreate(Before, View):
+    def get(self, request, model_name):
+        form = create_modelform(self.model)
         return render(request, "asset/create.html", locals())
-    def post(self,request,model_name):
-        dict = {"status":True,"error":None}
-        form = ServerForm(request.POST)
+
+    def post(self, request, model_name):
+        dict = {"status": True, "error": None}
+        modelform = create_modelform(self.model)
+        form = modelform(request.POST)
         if form.is_valid():
             form.save()
         else:
             return render(request, "asset/create.html", locals())
-        return HttpResponseRedirect('/asset/server/')
+        skip = reverse('asset:list', kwargs={"model_name": self.model_name})
+        return HttpResponseRedirect(skip)
 
-class AssetUpdate(View):
 
-    def dispatch(self, request, *args, **kwargs):
-        self.url = request.META.get('HTTP_REFERER')
-        obj = super(AssetUpdate, self).dispatch(request, *args, **kwargs)
-        return obj
 
-    def get(self,request,model_name):
-        url = self.url
-        edit_obj_list = request.GET.get("id").split(',')
-        q = models.Server.objects.filter(id__in=edit_obj_list)
-        formset = EditSeverFormSet(queryset=q)
+class AssetUpdate(Before, View):
+    def get(self, request, model_name):
+        obj_id_list = request.GET.get("id").split(',')
+        obj_list = self.model.objects.filter(id__in=obj_id_list)
+        modelformset = create_modelformset(self.model, self.admin_class.list_editable)
+        formset = modelformset(queryset=obj_list)
         return render(request, "asset/edit.html", locals())
 
-    def post(self,request,model_name):
-        formset = EditSeverFormSet(request.POST)
+    def post(self, request, model_name):
+        modelformset = create_modelformset(self.model, self.admin_class.list_editable)
+        formset = modelformset(request.POST)
         if formset.is_valid():
             formset.save()
         else:
-            print(formset.errors,'===============')
             return render(request, "asset/edit.html", locals())
-        return HttpResponseRedirect('/asset/server/')
+        skip = reverse('asset:list', kwargs={"model_name": self.model_name})
+        return HttpResponseRedirect(skip)
 
-# class AssetUpdate(UpdateView):
-#     model = models.Server
-#     form_class = forms.ServerForm
-#     template_name = 'asset/edit.html'
-#
-#     def get_context_data(self, **kwargs):
-#         context = super(AssetUpdate, self).get_context_data(**kwargs)
-#         if '__next__' in self.request.POST:
-#             context['i__next__'] = self.request.POST['__next__']
-#         else:
-#             context['i__next__'] = self.request.META['HTTP_REFERER']
-#         return context
-#     def get_success_url(self):
-#         self.url = self.request.POST['__next__']
-#         return self.url
 
 
 """

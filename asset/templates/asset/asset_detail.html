@@ -2,7 +2,6 @@
 {% load asset_tags %}
 
 {% block page_breadcrumbs %}
-    <li><a href="">资产列表</a></li>
     <li class="active">{{ object.name }}</li>
 {% endblock %}
 
@@ -10,143 +9,19 @@
     <div class="page-body">
         <div class="widget">
             <div class="widget-header bordered-left bordered-blueberry">
-                <span class="widget-caption"><strong>基础信息</strong></span>
+                <span class="widget-caption"><strong>基本信息</strong></span>
             </div>
             <div class="widget-body bordered-left bordered-blue" style="padding: 0px;">
                 <table class="table table-bordered table-condensed ">
                     <tbody>
-                    <tr>
-                        <td>IP</td>
-                        <td>{{ object.inner_ip }}</td>
-                    </tr>
-                    <tr>
-                        <td>管理IP</td>
-                        <td>{{ object.management_ip }}</td>
-                    </tr>
-                    <tr>
-                        <td>业务线</td>
-                        <td>{{ object.business_unit }}</td>
-                    </tr>
-                    <tr>
-                        <td>操作系统</td>
-                        <td colspan="4">{{ object.os_type }}</td>
-                    </tr>
-                    <tr>
-                        <td>系统版本</td>
-                        <td>{{ object.os_release }}</td>
-                    </tr>
-                    <tr>
-                        <td>SN号</td>
-                        <td>{{ object.sn }}</td>
-                    </tr>
-                    <tr>
-                        <td>设备类型</td>
-                        {% for i,v in object.server_type_choices %}
-                            {% if i == object.server_type %}
-                                <td>{{ v }}</td>
-                            {% endif %}
-                        {% endfor %}
-                    </tr>
-                    <tr>
-                        <td>设备型号</td>
-                        <td>{{ object.server_attr }}</td>
-                    </tr>
-                    <tr>
-                        <td>设备厂商</td>
-                        <td>{{ object.device_type }}</td>
-                    </tr>
-                    <tr>
-                        <td>购买时间</td>
-                        <td colspan="4">{{ object.trade_date }}</td>
-                    </tr>
-                    <tr>
-                        <td>过保时间</td>
-                        <td>{{ object.expire_date }}</td>
-                    </tr>
+                    {% detail object %}
                     </tbody>
                 </table>
             </div>
         </div>
-        <div class="widget">
-            <div class="widget-header bordered-left bordered-blueberry">
-                <span class="widget-caption"><strong>CUP信息</strong></span>
-            </div>
-            <div class="widget-body bordered-left bordered-blue" style="padding: 0px;">
-                <table class="table table-bordered table-condensed ">
-                    <tbody>
-                    <tr>
-                        <td>核心数</td>
-                        <td>型号</td>
-                        <td>主频（MHz）</td>
-                    </tr>
-                    {% for i in object.cpu_set.all %}
-                        <tr>
-                            <td>{{ i.count }}</td>
-                            <td>{{ i.model }}</td>
-                            <td>{{ i.speed }}</td>
-                        </tr>
-                    {% endfor %}
+        {% if model_name == 'server' %}
+            {% include 'asset/server_detail.html' %}
+        {% endif %}
+    </div>
 
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="widget">
-            <div class="widget-header bordered-left bordered-blueberry">
-                <span class="widget-caption"><strong>内存信息</strong></span>
-            </div>
-            <div class="widget-body bordered-left bordered-blue" style="padding: 0px;">
-                <table class="table table-bordered table-condensed ">
-                    <tbody>
-                    <tr>
-                        <td>插槽位</td>
-                        <td>大小（MB）</td>
-                        <td>型号</td>
-                        <td>速率</td>
-                        <td>SN</td>
-                    </tr>
-                    {% for i in object.mem_set.all %}
-                        <tr>
-                            <td>{{ i.slot }}</td>
-                            <td>{{ i.capacity }}</td>
-                            <td>{{ i.model }}</td>
-                            <td>{{ i.speed }}</td>
-                            <td>{{ i.sn }}</td>
-
-                        </tr>
-                    {% endfor %}
-
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="widget">
-            <div class="widget-header bordered-left bordered-blueberry">
-                <span class="widget-caption"><strong>磁盘信息</strong></span>
-            </div>
-            <div class="widget-body bordered-left bordered-blue" style="padding: 0px;">
-                <table class="table table-bordered table-condensed ">
-                    <tbody>
-                    <tr>
-                        <td>插槽位</td>
-                        <td>容量(GB)</td>
-                        <td>接口类型</td>
-                        <td>型号</td>
-                        <td>SN</td>
-                    </tr>
-                    {% for i in object.disk_set.all %}
-                        <tr>
-                            <td>{{ i.slot }}</td>
-                            <td>{{ i.capacity }}</td>
-                            <td>{{ i.iface_type }}</td>
-                            <td>{{ i.model }}</td>
-                            <td>{{ i.sn }}</td>
-                        </tr>
-                    {% endfor %}
-
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div><!--Widget Body-->
 {% endblock %}
