@@ -79,21 +79,20 @@
                 </li>
 
                 <!--Tables-->
-                <li class="active open">
+                <li>
                     <a href="#" class="menu-dropdown">
                         <i class="menu-icon fa fa-table"></i>
                         <span class="menu-text"> 资产管理 </span>
-
                         <i class="menu-expand"></i>
                     </a>
                     <ul class="submenu">
-                        <li class="active">
+                        <li id="server">
                             <a href="/asset/server/">
                                 <span class="menu-text">服务器</span>
                             </a>
                         </li>
                         <li>
-                            <a href="tables-data.html">
+                            <a href="/asset/networkdevice/">
                                 <span class="menu-text">网络设备</span>
                             </a>
                         </li>
@@ -104,7 +103,25 @@
                         </li>
                     </ul>
                 </li>
-
+                <li>
+                    <a href="#" class="menu-dropdown">
+                        <i class="menu-icon fa fa-table"></i>
+                        <span class="menu-text"> 业务管理 </span>
+                        <i class="menu-expand"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li >
+                            <a href="/asset/businessunit/">
+                                <span class="menu-text">业务线</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="tables-data.html">
+                                <span class="menu-text">业务模块</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
             </ul>
             <!-- /Menu -->
         </div>
@@ -113,7 +130,7 @@
             <div class="page-breadcrumbs">
                 <ul class="breadcrumb">
                     <li><i class="fa fa-home"></i> <a href="/asset/server/">Home</a></li>
-                    <li class="active"><a href="{% url 'asset:list' model_name=model_name %}">{{ model_name }}</a></li>
+                    <li class="active"><a href="{% url 'asset:list' model_name=model_name %}">{{ title }}</a></li>
                     {% block page_breadcrumbs %}
                     {% endblock %}
                 </ul>
@@ -130,6 +147,7 @@
 <script src="{% static "js/jquery-2.0.3.min.js" %}"></script>
 <script src="{% static "js/jquery.cookie.js" %}"></script>
 <script src="{% static "js/bootstrap.min.js" %}"></script>
+<script src="{% static "js/bootstrap-treeview.js" %}"></script>
 <script src="{% static "js/beyond.min.js" %}"></script>
 <script src="{% static "js/datatable/jquery.dataTables.min.js" %}"></script>
 <script src="{% static "js/datatable/ZeroClipboard.js" %}"></script>
@@ -138,24 +156,6 @@
 <script src="{% static "js/datatable/datatables-init.js" %}"></script>
 
 {% block js %}{% endblock %}
-<!--Google Analytics::Demo Only-->
-<script>
-    (function (i, s, o, g, r, a, m) {
-        i['GoogleAnalyticsObject'] = r;
-        i[r] = i[r] || function () {
-                (i[r].q = i[r].q || []).push(arguments)
-            }, i[r].l = 1 * new Date();
-        a = s.createElement(o),
-            m = s.getElementsByTagName(o)[0];
-        a.async = 1;
-        a.src = g;
-        m.parentNode.insertBefore(a, m)
-    })(window, document, 'script', 'http://www.google-analytics.com/analytics.js', 'ga');
-
-    ga('create', 'UA-52103994-1', 'auto');
-    ga('send', 'pageview');
-</script>
-
 
 </body>
 </html>

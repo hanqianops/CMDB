@@ -1,7 +1,7 @@
 {% extends "asset/base.html" %}
 {% load asset_tags %}
 {% block page_breadcrumbs %}
-    <li class="active">{{ self.title }}信息</li>
+    <li class="active">创建{{ self.title }}信息</li>
 {% endblock %}
 {% block body %}
     <div class="page-body">
@@ -24,7 +24,7 @@
                     </div>
                     <div class="widget-body">
                         <form id="iFormCreate" class="form-horizontal" method="post" novalidate>
-                            <input type="hidden" name="__next__" value="{{ i__next__ }}">
+                            <input type="hidden" name="__next__" value="{{ last_url }}">
                             {% csrf_token %}
                             {% for obj in form %}
                                 <div class="form-group">
@@ -38,7 +38,7 @@
                             <h5 class="page-header"></h5>
                             <div class="form-group">
                                 <div class="col-sm-4 col-sm-offset-3">
-                                    <a href="{{ i__next__ }}" class="btn btn-white">取消</a>
+                                    <a href="{{ last_url }}" class="btn btn-white">取消</a>
                                 </div>
                                 <div class="col-sm-4">
                                     <button type="submit" class="btn btn-primary">保存</button>

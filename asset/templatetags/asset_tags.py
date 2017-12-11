@@ -165,6 +165,7 @@ def status(model_name,request):
 def detail(object):
     fields = object._meta.fields
     t = ""
+    print(fields,'=================')
     for field_obj in fields:
         tr = "<tr><td>{0}</td>".format(field_obj.verbose_name)
         if field_obj.get_internal_type() == 'DateTimeField':

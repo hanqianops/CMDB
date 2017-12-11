@@ -1,26 +1,17 @@
-from django.shortcuts import render
-
-
-# Create your views here.
-
-def index(request):
-    return render(request, "asset/index.html")
-
-
 import json
-from asset import models
-from django.views.generic import View
-from django.views.generic import ListView
-from django.views.generic import DetailView
-from django.urls import reverse
+
 from django.db.models import Q
-from asset.app_config import site
-from asset.plugins.page import PageInfo
 from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render
+from django.urls import reverse
+from django.views.generic import DetailView
+from django.views.generic import ListView
+from django.views.generic import View
+
+from asset import models
+from asset.app_config import site
 from asset.forms import create_modelform, create_modelformset
-
-print(site.apps['asset']['server'].list_display)
-
+from asset.plugins.page import PageInfo
 
 class Before(object):
     def dispatch(self, request, *args, **kwargs):
@@ -28,7 +19,6 @@ class Before(object):
         self.admin_class = site.apps['asset'][self.model_name]
         self.model = site.apps['asset'][self.model_name].model
         self.title = self.model._meta.verbose_name
-        self.last_url = request.META.get('HTTP_REFERER')
         print("session对象", request.session.__dict__, )
         print("COOKIES对象", request.COOKIES)
         print("请求的路径", request.path_info)
@@ -38,15 +28,16 @@ class Before(object):
 
 
 class FilterSearch(object):
-    def __init__(self, request):
+    def __init__(self, request,model_name):
         self.request = request
+        self.model_name = model_name
 
     def _search_field(self):
         search_text = self.request.GET.get("search")
         search_obj = Q()
         if search_text:
             search_obj.connector = "OR"
-            for search_field in site.apps['asset']['server'].search_fields:
+            for search_field in site.apps['asset'][self.model_name].search_fields:
                 search_obj.children.append(("%s__contains" % search_field, search_text))
         return search_obj
 
@@ -72,12 +63,14 @@ class FilterSearch(object):
         obj.add(self._status_field(), "AND")
         return obj
 
+# def Project_top_class():
+
 
 class AssetList(Before, ListView):
     template_name = "asset/asset_list.html"
 
     def get_queryset(self):
-        obj = FilterSearch(self.request)
+        obj = FilterSearch(self.request,self.model_name)
         obj_list = self.model.objects.filter(obj.project_module_list())
         current_page = self.request.GET.get("page")
 
@@ -91,9 +84,10 @@ class AssetList(Before, ListView):
 
     def get_context_data(self, **kwargs):
         context = super(AssetList, self).get_context_data(**kwargs)
+        # context.update(gg(self.request,Before()))
         context['model_name'] = self.kwargs['model_name']
         context['page_info'] = self.page_info
-        context['title'] = self.title
+        context['title'] = self.model._meta.verbose_name
         context['admin_class'] = self.admin_class
         return context
 
@@ -127,6 +121,7 @@ class AssetDelete(View):
 class AssetCreate(Before, View):
     def get(self, request, model_name):
         form = create_modelform(self.model)
+        last_url = request.META.get('HTTP_REFERER')
         return render(request, "asset/create.html", locals())
 
     def post(self, request, model_name):

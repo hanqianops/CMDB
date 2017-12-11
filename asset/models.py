@@ -85,7 +85,7 @@ class NetworkDevice(BaseTimeField):
     model = models.CharField(verbose_name=u'型号', max_length=128, null=True, blank=True)
     firmware = models.CharField(verbose_name=u'固件信息', max_length=128,  blank=True, null=True)
     port_num = models.SmallIntegerField(verbose_name=u'端口个数', null=True, blank=True)
-    device_detail = models.TextField(verbose_name=u'设置详细配置', null=True, blank=True)
+    device_detail = models.TextField(verbose_name=u'配置', null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -202,13 +202,16 @@ class BusinessUnit(models.Model):
 
     name = models.CharField(u'业务线', max_length=64, unique=True)
     # 上级业务线，可以创建层级关系
-    parent_unit = models.ForeignKey('self', related_name='parent_level', blank=True, null=True)
+    parent_unit = models.ForeignKey(verbose_name='上层模块',to='self', related_name='parent_level', blank=True, null=True)
     # 业务负责人，之后关联用户表
     principal = models.CharField(u"负责人", max_length=64, blank=True, null=True)
     memo = models.CharField(u'备注', max_length=64, blank=True)
 
     def __str__(self):
-        return self.name
+        if self.parent_unit:
+            return "%s-%s"%(self.parent_level,self.name)
+        else:
+            return self.name
 
     class Meta:
         verbose_name = '业务线'

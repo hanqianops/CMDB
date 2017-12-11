@@ -69,42 +69,41 @@
             <!-- /Page Sidebar Header -->
 
             <!-- Menu -->
-            <ul class="nav sidebar-menu">
+            <ul id="menu" class="nav sidebar-menu">
                 <!--Dashboard-->
-                <li>
-                    <a href="index.html">
+                <li class="open">
+                    <a href="#">
                         <i class="menu-icon glyphicon glyphicon-home"></i>
                         <span class="menu-text"> Dashboard </span>
                     </a>
                 </li>
 
                 <!--Tables-->
-                <li class="">
+                <li id='xxx' class="active">
                     <a href="#" class="menu-dropdown">
                         <i class="menu-icon fa fa-table"></i>
                         <span class="menu-text"> 资产管理 </span>
 
                         <i class="menu-expand"></i>
                     </a>
-                    <ul class="submenu">
-                        <li class="active">
-                            <a id='ww' href="#">
+                    <ul id='ww' class="submenu">
+                        <li id="server" class="active">
+                            <a href="javascript:void(0);">
                                 <span class="menu-text">服务器</span>
                             </a>
                         </li>
-                        <li>
-                            <a href="/asset/networkdevice/">
+                        <li id="networkdevice">
+                            <a href="javascript:void(0);">
                                 <span class="menu-text">网络设备</span>
                             </a>
                         </li>
-                        <li>
-                            <a href="/asset/idc/">
+                        <li id="idc">
+                            <a href="javascript:void(0);">
                                 <span class="menu-text">IDC机房</span>
                             </a>
                         </li>
                     </ul>
                 </li>
-
                 <li class="">
                     <a href="#" class="menu-dropdown">
                         <i class="menu-icon fa fa-table"></i>
@@ -119,7 +118,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="/asset/networkdevice/">
+                            <a href="tables-data.html">
                                 <span class="menu-text">网络设备</span>
                             </a>
                         </li>
@@ -130,6 +129,7 @@
                         </li>
                     </ul>
                 </li>
+
             </ul>
             <!-- /Menu -->
         </div>
@@ -138,17 +138,17 @@
             <div class="page-breadcrumbs">
                 <ul class="breadcrumb">
                     <li><i class="fa fa-home"></i> <a href="/asset/server/">Home</a></li>
-{#                    <li class="active"><a href="{% url 'asset:list' model_name=model_name %}">{{ model_name }}</a></li>#}
+                    {#                    <li class="active"><a href="{% url 'asset:list' model_name=model_name %}">{{ model_name }}</a></li>#}
                     {% block page_breadcrumbs %}
                     {% endblock %}
                 </ul>
             </div>
             <!-- /面包屑导航 -->
-        <div id="ddd">
+            <div id="body">
 
-        </div>
-{#            {% block body %}#}
-{#            {% endblock %}#}
+            </div>
+            {#            {% block body %}#}
+            {#            {% endblock %}#}
         </div>
     </div>
 </div>
@@ -164,13 +164,25 @@
 <script src="{% static "js/datatable/dataTables.bootstrap.min.js" %}"></script>
 <script src="{% static "js/datatable/datatables-init.js" %}"></script>
 
-{% block js %}{% endblock %}
-<!--Google Analytics::Demo Only-->
-
 <script>
-    $('#ww').click(function () {
-        $('#ddd').load('/asset/server/')
+    $('.submenu li').click(function (i, t) {
+        var url = '/asset/' + $(this).attr('id')
+        var stateObject = {};
+        var title = "";
+        history.pushState(stateObject, title, url);
+        $('#body').load(url)
     })
+    {#    $('#ww').click(function () {#}
+    {#        var stateObject = {};#}
+    {#        var title = "Wow Title";#}
+    {#        var newUrl = "/my/awesome/url";#}
+    {#        history.pushState(stateObject, title, 'server/');#}
+    {#        $('#ddd').load('/asset/server/')#}
+    {#    })#}
+    {#    $('#menu').click(function (i) {#}
+    {#        alert(i)#}
+    {##}
+    {#    })#}
 </script>
 
 </body>

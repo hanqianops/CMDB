@@ -1,7 +1,7 @@
 {% extends "asset/base.html" %}
 {% load asset_tags %}
 {% block page_breadcrumbs %}
-    <li class="active" xmlns="http://www.w3.org/1999/html">资产列表</li>
+    <li class="active" >资产列表</li>
 {% endblock %}
 {% block body %}
     <div class="page-body">
@@ -9,7 +9,7 @@
             <div class="col-xs-12 col-md-12">
                 <div class="widget" >
                     <div class="widget-header ">
-                        <span class="widget-caption">新建{{ self.title }}信息</span>
+                        <span class="widget-caption">编辑{{ title }}信息</span>
                         <div class="widget-buttons">
                             <a href="#" data-toggle="maximize">
                                 <i class="fa fa-expand"></i>
@@ -55,7 +55,7 @@
                             <div class="row" style="margin: 10px">
 
                                 <div class="col-sm-2 col-sm-offset-4">
-                                    <a href="{{ self.last_url }}" class="btn ">取消</a>
+                                    <a href="{{ last_url }}" class="btn ">取消</a>
                                 </div>
                                 <div class="col-sm-2">
                                     <button type="submit" class="btn ">保存</button>

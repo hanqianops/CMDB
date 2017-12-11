@@ -1,6 +1,9 @@
 {% extends "asset/base.html" %}
 {% load asset_tags %}
 {% block title %}{{ title }}{% endblock %}
+{% block page_breadcrumbs %}
+    <li class="active"><a href="{% url 'asset:list' model_name=model_name %}">{{ self.title }}</a></li>
+{% endblock %}
 {% block body %}
     <!-- Page Body -->
     <div class="page-body">
@@ -13,7 +16,7 @@
         </div>
         <div class="row">
             <div class="col-xs-12 col-md-12">
-                <div class="widget">
+                <div class="widget" >
                     <div class="widget-header ">
                         <span class="widget-caption">{{ title }}信息</span>
                         <div class="widget-buttons">
@@ -28,7 +31,7 @@
                             </a>
                         </div>
                     </div>
-                    <div class="widget-body">
+                    <div class="widget-body" >
                         <div class="table-toolbar">
                             <a id="add" href="{% url 'asset:add' model_name=model_name %}" class="btn"> 新增</a>
                             <a id="edit" href="javascript:void(0);" class="btn"> 批量编辑</a>
@@ -72,7 +75,7 @@
                                 {% for row in object_list %}
                                     <tr id="{{ row.id }}">
                                         <td><label><input type="checkbox"><span class="text"></span></label></td>
-                                            {% tbody_tr row admin_class.list_display %}
+                                        {% tbody_tr row admin_class.list_display %}
                                         <td>
                                             <a href="{{ row.id }}/"> 详细信息 |</a>
                                             <a href='javascript:void(0)' onclick='modalObj({{ row.id }});'> 删除</a>
@@ -151,17 +154,38 @@
 {% block js %}
     <script>
         $(function () {
+            InitMenu();
+            ClickMenu();
             ChangeSelect();
             ClickProjectModule();
             ChangeProjectModule();
             Search();
             ChangeSelect();
         });
+        function ClickMenu() {
+            $('.submenu li a').click(function (i, t) {
+                var storage = window.localStorage;
+                storage["a"] = $(this).children().text();
+                {#                alert('设置Cookie: ' + storage["a"])#}
+            })
+        }
+        function InitMenu() {
+            {#            alert('当前Cookie: ' + $.cookie('str'))#}
+            var storage = window.localStorage;
+            $('.submenu li a').each(function (i, k) {
+                var t = $(this).children().text()
+                if (storage["a"] == t) {
+                    $(this).parent().parent().parent().addClass('open')
+                    $(this).parent().addClass('active')
+                }
+            })
+        }
+
         $('#edit').click(function () {
             /*编辑按钮*/
             var aID = new Array
             $(":checkbox:checked").closest("tr").each(function (i, tr) {
-{#                var val = tr.children[1].innerText#}  // 需要ID列
+                {#                var val = tr.children[1].innerText#}  // 需要ID列
                 var val = tr.getAttribute("id")
                 if (val != "") {
                     aID.push(val)
