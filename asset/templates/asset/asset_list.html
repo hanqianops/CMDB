@@ -2,7 +2,7 @@
 {% load asset_tags %}
 {% block title %}{{ title }}{% endblock %}
 {% block page_breadcrumbs %}
-    <li class="active"><a href="{% url 'asset:list' model_name=model_name %}">{{ self.title }}</a></li>
+{#    <li class="active"><a href="{% url 'asset:list' model_name=model_name %}">{{ self.title }}</a></li>#}
 {% endblock %}
 {% block body %}
     <!-- Page Body -->
@@ -11,12 +11,12 @@
              style="z-index:9999;left:40%;top:10%;width: 20%; display: none;position: fixed;">
             <p id="divdelaytext"
                style="background: none repeat scroll 0 0 #000; border-radius: 30px;color: #fff; margin: 0 auto;padding: 10px;text-align: center;width: 70%;opacity: 0.8; font-family:Microsoft YaHei;letter-spacing: 1px;font-size: 15px;">
-                删除成功
+                请不要删除数据
             </p>
         </div>
         <div class="row">
             <div class="col-xs-12 col-md-12">
-                <div class="widget" >
+                <div class="widget">
                     <div class="widget-header ">
                         <span class="widget-caption">{{ title }}信息</span>
                         <div class="widget-buttons">
@@ -31,7 +31,7 @@
                             </a>
                         </div>
                     </div>
-                    <div class="widget-body" >
+                    <div class="widget-body">
                         <div class="table-toolbar">
                             <a id="add" href="{% url 'asset:add' model_name=model_name %}" class="btn"> 新增</a>
                             <a id="edit" href="javascript:void(0);" class="btn"> 批量编辑</a>
@@ -187,9 +187,10 @@
             $(":checkbox:checked").closest("tr").each(function (i, tr) {
                 {#                var val = tr.children[1].innerText#}  // 需要ID列
                 var val = tr.getAttribute("id")
-                if (val != "") {
+                if (val != null) {
                     aID.push(val)
                 }
+
             })
             if (aID != '') {
                 $('#editSub').attr("href", 'edit/?id=' + aID.join(','))
@@ -203,13 +204,13 @@
         function modalObj(val) {
             /*修改模态框数据*/
             $.ajax({
-                url: '/asset/server/delete/' + val + '/',
+                url: 'delete/' + val + '/',
                 type: 'GET',
                 data: {},
                 dataType: 'json',
                 success: function (data) {
                     if (data.status) {
-                        $('#deleteModalShow').text('是否删除主机: ' + data.name)
+                        $('#deleteModalShow').text('是否删除: ' + data.name)
                         $('#deleteobj').attr('onclick', 'deleteObj(' + data.id + ');')
                         $('#deleteModal').modal('show')
                     }
@@ -225,7 +226,7 @@
                 dataType: 'json',
                 success: function (data) {
                     $('#divdelay').css('display', 'block')
-                    data.status ? $('#divdelaytext').text('删除成功') : $('#divdelaytext').text('删除失败')
+                    data.status ? $('#divdelaytext').text('删除成功') : $('#divdelaytext').text('请不要删除数据')
                     window.setTimeout("$('#divdelay').css('display','none')", 2000)
                 }
             })

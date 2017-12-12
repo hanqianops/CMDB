@@ -1,6 +1,7 @@
 {% extends "asset/base.html" %}
 {% load asset_tags %}
 {% block page_breadcrumbs %}
+    <li class="active"><a href="{% url 'asset:list' model_name=model_name %}">{{ self.title }}列表</a></li>
     <li class="active">创建{{ self.title }}信息</li>
 {% endblock %}
 {% block body %}

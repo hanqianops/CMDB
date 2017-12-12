@@ -6,8 +6,8 @@ from django import forms
 
 
 class ServerAdmin(BaseAdmin):
-    list_display = ("name", "inner_ip", "os_type", "os_release", "cabinet.cabinet_num", "device_status")
-    list_editable = ('name', 'cabinet', 'device_status', 'server_type', 'upper_layer', 'switch')
+    list_display = ("name", "inner_ip", "business_unit","os_type", "os_release", "cabinet.cabinet_num", "device_status")
+    list_editable = ('name', 'business_unit','cabinet', 'device_status', 'server_type', 'upper_layer', 'switch')
     readonly_fields = ("name",)
     # widgets = { "name": forms.TextInput(attrs={'class': 'form-control', 'readonly': ''}), }
     search_fields = ("name", "inner_ip")

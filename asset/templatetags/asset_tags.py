@@ -32,7 +32,7 @@ def thead(model_name,):
             html_str += "<th>{0}</th>".format(dic.get(display_name))
         else:
             html_str += "<th>{0}</th>".format(get_verbose_name(*field))
-
+    print("表头",html_str,)
     return mark_safe(html_str)
 
 
@@ -41,11 +41,14 @@ def get_field(obj,field):
     获取对象的指定熟悉
     :param obj:  可以是一行数据对象也可以是一个字段对象
     """
-    if obj._meta.get_field(field).choices:
-        f = 'get_{0}_display'.format(field)
-        tr_str = "<td>{0}</td>".format(getattr(obj, f)())
-    else:
-        tr_str = "<td>{0}</td>".format(getattr(obj, field))
+    try:
+        if obj._meta.get_field(field).choices:
+            f = 'get_{0}_display'.format(field)
+            tr_str = "<td>{0}</td>".format(getattr(obj, f)())
+        else:
+            tr_str = "<td>{0}</td>".format(getattr(obj, field))
+    except Exception as e:
+        tr_str = "<td></td>"
     return tr_str
 
 
@@ -131,13 +134,25 @@ def project(request):
     return mark_safe(html_business)
 
 
+def recursion_project(project_id):
+    module_obj_list = list(BusinessUnit.objects.filter(parent_unit_id=project_id).values('id', 'name'))
+    for L in module_obj_list:
+        if list(BusinessUnit.objects.filter(parent_unit_id=L['id']).values('id', 'name')):
+            module_obj_list += list(BusinessUnit.objects.filter(parent_unit_id=L['id']).values('id', 'name'))
+            return recursion_project(project_id)
+    return module_obj_list
+
+
 @register.simple_tag
 def module(request):
     module_id = get_parameter(request,("module_id",))
     project_id = request.GET.get("project_id")
+
     if project_id:
-        module_obj_list = BusinessUnit.objects.filter(parent_unit_id=project_id).values('id', 'name')
+        module_obj_list = list(BusinessUnit.objects.filter(parent_unit_id=project_id).values('id', 'name'))
         html_module = "<li><a href='?project_id={0}'>全部模块</a></li>".format(project_id)
+        for L2 in module_obj_list:
+            module_obj_list += list(BusinessUnit.objects.filter(parent_unit_id=L2['id']).values('id', 'name'))
 
     else:
         module_obj_list = BusinessUnit.objects.filter(parent_unit_id__isnull=False).values('id', 'name')
@@ -156,7 +171,6 @@ def status(model_name,request):
     html_status = "<li><a href='?'>全部状态</a></li>"
     for id,name in L:
         html_status += "<li><a onclick='FilterStatus({0})'>{1}</a></li>".format(id,name)
-        print(id,name)
     return mark_safe(html_status)
 
 
@@ -165,7 +179,6 @@ def status(model_name,request):
 def detail(object):
     fields = object._meta.fields
     t = ""
-    print(fields,'=================')
     for field_obj in fields:
         tr = "<tr><td>{0}</td>".format(field_obj.verbose_name)
         if field_obj.get_internal_type() == 'DateTimeField':

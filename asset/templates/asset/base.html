@@ -77,8 +77,6 @@
                         <span class="menu-text"> Dashboard </span>
                     </a>
                 </li>
-
-                <!--Tables-->
                 <li>
                     <a href="#" class="menu-dropdown">
                         <i class="menu-icon fa fa-table"></i>
@@ -104,24 +102,13 @@
                     </ul>
                 </li>
                 <li>
-                    <a href="#" class="menu-dropdown">
-                        <i class="menu-icon fa fa-table"></i>
+                    <a href="/asset/businessunit/">
+                        <i class="menu-icon fa fa-group"></i>
+{#                        <i class="menu-icon glyphicon glyphicon-home"></i>#}
                         <span class="menu-text"> 业务管理 </span>
-                        <i class="menu-expand"></i>
                     </a>
-                    <ul class="submenu">
-                        <li >
-                            <a href="/asset/businessunit/">
-                                <span class="menu-text">业务线</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="tables-data.html">
-                                <span class="menu-text">业务模块</span>
-                            </a>
-                        </li>
-                    </ul>
                 </li>
+
             </ul>
             <!-- /Menu -->
         </div>
@@ -130,7 +117,6 @@
             <div class="page-breadcrumbs">
                 <ul class="breadcrumb">
                     <li><i class="fa fa-home"></i> <a href="/asset/server/">Home</a></li>
-                    <li class="active"><a href="{% url 'asset:list' model_name=model_name %}">{{ title }}</a></li>
                     {% block page_breadcrumbs %}
                     {% endblock %}
                 </ul>

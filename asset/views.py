@@ -53,11 +53,15 @@ class FilterSearch(object):
         module_id = self.request.GET.get("module_id")
         obj = Q()
         if module_id:
+            obj.connector = 'OR'
             obj.children.append(('business_unit_id', module_id))
+            obj.children.append(('business_unit__parent_unit_id', module_id))
         elif project_id:
             obj.connector = 'OR'
-            obj.children.append(('business_unit__parent_unit_id', project_id))
-            obj.children.append(('business_unit_id', project_id))  # 还没二级分组的情况
+            obj.children.append(('business_unit_id', project_id))  # 一级分组
+            obj.children.append(('business_unit__parent_unit_id', project_id))  # 二级分组
+            obj.children.append(('business_unit__parent_unit_id__parent_unit_id', project_id))
+
 
         obj.add(self._search_field(), "AND")
         obj.add(self._status_field(), "AND")
@@ -97,19 +101,20 @@ class AssetDetail(Before,DetailView):
     def get(self, request, *args, **kwargs):
         object = self.model.objects.get(id=kwargs['id'])
         model_name=self.model_name
+        title = self.model._meta.verbose_name
         return render(request,'asset/asset_detail.html',locals())
 
 
 
-class AssetDelete(View):
+class AssetDelete(Before,View):
     def post(self, request, *args, **kwargs):
         # return HttpResponseRedirect('/asset/server')
         dic = {"status": False}
         return HttpResponse(json.dumps(dic))
 
-    def get(self, request, model_name, pk):
+    def get(self, request, *args, **kwargs):
         dic = {"status": True}
-        object = models.Server.objects.filter(id=pk).values('name', 'id')
+        object = self.model.objects.filter(id=kwargs['pk']).values('name', 'id')
         if object:
             dic.update(object[0])
         else:
@@ -122,6 +127,7 @@ class AssetCreate(Before, View):
     def get(self, request, model_name):
         form = create_modelform(self.model)
         last_url = request.META.get('HTTP_REFERER')
+        title = self.model._meta.verbose_name
         return render(request, "asset/create.html", locals())
 
     def post(self, request, model_name):
@@ -139,6 +145,7 @@ class AssetCreate(Before, View):
 
 class AssetUpdate(Before, View):
     def get(self, request, model_name):
+        title = self.model._meta.verbose_name
         obj_id_list = request.GET.get("id").split(',')
         obj_list = self.model.objects.filter(id__in=obj_id_list)
         modelformset = create_modelformset(self.model, self.admin_class.list_editable)

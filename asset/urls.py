@@ -10,5 +10,5 @@ urlpatterns = [
     url(r'^(?P<model_name>\w+)/$', views.AssetList.as_view(), name='list'),
     url(r'^(?P<model_name>\w+)/edit/$', views.AssetUpdate.as_view(), name='edit'),
     url(r'^(?P<model_name>\w+)/add/$', views.AssetCreate.as_view(), name='add'),
-    url(r'^(?P<model_name>\w+)/delete/(?P<id>\d+)/$', views.AssetDelete.as_view(), name='delete'),
+    url(r'^(?P<model_name>\w+)/delete/(?P<pk>\d+)/$', views.AssetDelete.as_view(), name='delete'),
 ]

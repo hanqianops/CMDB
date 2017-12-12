@@ -45,7 +45,7 @@ class Cabinet(BaseTimeField):
 class Server(BaseTimeField):
     """服务器设备"""
     cabinet = models.OneToOneField(verbose_name=u'机柜信息',to='Cabinet', null=True, blank=True)
-    name = models.CharField(verbose_name=u'主机名',max_length=18, unique=True)
+    name = models.CharField(verbose_name=u'主机名',max_length=30, unique=True)
     inner_ip = models.GenericIPAddressField(verbose_name=u'内网IP', blank=True, null=True)
     management_ip = models.GenericIPAddressField(verbose_name=u'管理IP', blank=True, null=True)
     business_unit = models.ForeignKey('BusinessUnit', verbose_name='属于的业务线', null=True, blank=True)
@@ -207,13 +207,17 @@ class BusinessUnit(models.Model):
     principal = models.CharField(u"负责人", max_length=64, blank=True, null=True)
     memo = models.CharField(u'备注', max_length=64, blank=True)
 
-    def __str__(self):
+    def save(self, *args, **kwargs):
         if self.parent_unit:
-            return "%s-%s"%(self.parent_level,self.name)
-        else:
+            self.name = '-'.join([str(self.parent_unit),str(self.name)])
+        return super(BusinessUnit, self).save(*args, **kwargs)
+
+
+    def __str__(self):
             return self.name
 
     class Meta:
+        ordering = ['name']
         verbose_name = '业务线'
         verbose_name_plural = "业务线"
 
