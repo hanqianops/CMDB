@@ -13,12 +13,16 @@ from asset.app_config import site
 from asset.forms import create_modelform, create_modelformset
 from asset.plugins.page import PageInfo
 
+def index(request):
+    return render(request,'asset/eee.html',locals())
+
 class Before(object):
     def dispatch(self, request, *args, **kwargs):
         self.model_name = self.kwargs['model_name']
         self.admin_class = site.apps['asset'][self.model_name]
         self.model = site.apps['asset'][self.model_name].model
         self.title = self.model._meta.verbose_name
+        request.session['display_field'] = request.GET.get('display_field')
         print("session对象", request.session.__dict__, )
         print("COOKIES对象", request.COOKIES)
         print("请求的路径", request.path_info)

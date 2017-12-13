@@ -22,8 +22,11 @@ def get_verbose_name(model_name,field_name=None):
     return dic
 
 @register.simple_tag
-def thead(model_name,):
-    list_display = site.apps['asset'][model_name].list_display
+def thead(request,model_name,):
+    if request.session.get('display_field'):
+        list_display = request.session.get('display_field').split(',')
+    else:
+        list_display = site.apps['asset'][model_name].list_display
     dic = get_verbose_name(model_name)
     html_str = ""
     for display_name in list_display:
@@ -54,8 +57,10 @@ def get_field(obj,field):
 
 
 @register.simple_tag
-def tbody_tr(row,list_display):
+def tbody_tr(request,row,list_display):
     tr_str = ""
+    if request.session.get('display_field'):
+        list_display = request.session.get('display_field').split(',')
     for display_field in list_display:
         field = display_field.split('.')
         if len(field) == 1:
@@ -66,7 +71,6 @@ def tbody_tr(row,list_display):
                 tr_str += get_field(field_obj,field[1])
             except Exception as e:
                 tr_str += "<td></td>"
-        print(tr_str,'==========================')
     return mark_safe(tr_str)
 
 
@@ -173,6 +177,19 @@ def status(model_name,request):
         html_status += "<li><a onclick='FilterStatus({0})'>{1}</a></li>".format(id,name)
     return mark_safe(html_status)
 
+@register.simple_tag
+def custom_field(model_name):
+    """
+    自定义显示字段的下拉菜单
+    :param model_name:
+    :return:  [{'id': 'ID'}, {'name': '业务线'}, {'parent_unit': '上层模块'}, {'principal': '负责人'}, {'memo': '备注'}]
+    """
+    field_list = []
+    model = site.apps['asset'][model_name].model
+    fields = model._meta.fields
+    for i in fields:
+        field_list.append({i.name: i.verbose_name})
+    return mark_safe(str(field_list))
 
 
 @register.simple_tag

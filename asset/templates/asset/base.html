@@ -16,10 +16,6 @@
     <link href="{% static "css/font-awesome.min.css" %}" rel="stylesheet"/>
     <link href="{% static "css/weather-icons.min.css" %}" rel="stylesheet"/>
 
-    <!--Fonts-->
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300"
-          rel="stylesheet" type="text/css">
-
     <!--Beyond styles-->
     <link id="beyond-link" href="{% static "css/beyond.min.css" %}" rel="stylesheet"/>
     <link href="{% static "css/demo.min.css" %}" rel="stylesheet"/>
@@ -29,7 +25,7 @@
 
     <!--Page Related styles-->
     <link href="{% static "css/dataTables.bootstrap.css" %}" rel="stylesheet"/>
-
+    <link href="{% static "css/hsCheckData.css" %}" rel="stylesheet"/>
     <!--Skin Script: Place this script in head to load scripts for skins and rtl support-->
     <script src="{% static "js/skins.min.js" %}"></script>
 
@@ -104,7 +100,7 @@
                 <li>
                     <a href="/asset/businessunit/">
                         <i class="menu-icon fa fa-group"></i>
-{#                        <i class="menu-icon glyphicon glyphicon-home"></i>#}
+                        {#                        <i class="menu-icon glyphicon glyphicon-home"></i>#}
                         <span class="menu-text"> 业务管理 </span>
                     </a>
                 </li>
@@ -129,7 +125,6 @@
     </div>
 </div>
 
-
 <script src="{% static "js/jquery-2.0.3.min.js" %}"></script>
 <script src="{% static "js/jquery.cookie.js" %}"></script>
 <script src="{% static "js/bootstrap.min.js" %}"></script>
@@ -140,6 +135,9 @@
 <script src="{% static "js/datatable/dataTables.tableTools.min.js" %}"></script>
 <script src="{% static "js/datatable/dataTables.bootstrap.min.js" %}"></script>
 <script src="{% static "js/datatable/datatables-init.js" %}"></script>
+
+<script src="{% static "js/checkbox/hsCheckData.js" %}"></script>
+<script src="{% static "js/checkbox/cityData.js" %}"></script>
 
 {% block js %}{% endblock %}
 

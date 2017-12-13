@@ -1,10 +1,9 @@
 {% extends "asset/base.html" %}
 {% load asset_tags %}
 {% block title %}{{ title }}{% endblock %}
-{% block page_breadcrumbs %}
-{#    <li class="active"><a href="{% url 'asset:list' model_name=model_name %}">{{ self.title }}</a></li>#}
-{% endblock %}
+
 {% block body %}
+
     <!-- Page Body -->
     <div class="page-body">
         <div id="divdelay"
@@ -36,6 +35,12 @@
                             <a id="add" href="{% url 'asset:add' model_name=model_name %}" class="btn"> 新增</a>
                             <a id="edit" href="javascript:void(0);" class="btn"> 批量编辑</a>
                             <a id="editSub" class="hide"></a>
+
+
+                            <div class="btn-group pull-right">
+                                <div id="cityDuoXuan"><span class="text">自定义显示字段</span></div>
+                            </div>
+
                         </div>
                         {% if model_name == 'server' %}
                             {% include 'asset/filter.html' %}
@@ -46,7 +51,6 @@
                                 <div class="dataTables_length">
                                     <a href="?" class="btn btn-default">重置</a>
                                 </div>
-
                                 <div class="dataTables_filter">
                                     <label>
                                         <input type="search" class="form-control input-sm"
@@ -59,7 +63,7 @@
 
                         <table class="table table-striped table-bordered table-hover">
                             {% if object_list %}
-                                <thead>
+                                <thead id="thead">
                                 <tr>
                                     <th onclick="SelectAll()">
                                         <label>
@@ -67,7 +71,7 @@
                                             <span class="text"></span>
                                         </label>
                                     </th>
-                                    {% thead model_name %}
+                                    {% thead request model_name %}
                                     <th>操作</th>
                                 </tr>
                                 </thead>
@@ -75,15 +79,13 @@
                                 {% for row in object_list %}
                                     <tr id="{{ row.id }}">
                                         <td><label><input type="checkbox"><span class="text"></span></label></td>
-                                        {% tbody_tr row admin_class.list_display %}
+                                        {% tbody_tr request row admin_class.list_display %}
                                         <td>
                                             <a href="{{ row.id }}/"> 详细信息 |</a>
                                             <a href='javascript:void(0)' onclick='modalObj({{ row.id }});'> 删除</a>
                                         </td>
                                     </tr>
-
                                 {% endfor %}
-                                {#                                {% tbody model_name object_list page_obj %}#}
                                 </tbody>
                             {% else %}
                                 <tbody>
@@ -152,6 +154,7 @@
 {% endblock %}
 
 {% block js %}
+
     <script>
         $(function () {
             InitMenu();
@@ -162,6 +165,41 @@
             Search();
             ChangeSelect();
         });
+
+
+        $('#cityDuoXuan').hsCheckData({
+            /*生成字段下拉菜单*/
+            isShowCheckBox: true, //默认为false
+            //minCheck: 3,//默认为0，不限最少选择个数
+            //maxCheck: 6,//默认为0，不限最多选择个数
+            //data: cityData
+            data: {% custom_field model_name %}
+        });
+        $('#cityDuoXuan').click(function () {
+            /*把当前显示的字段选中*/
+            var currentField = $('#thead tr').text();
+            $('[name=dataliCheck]').each(function (i, k) {
+                var temp = currentField.search($(this).next().text())
+                if (temp != -1) {
+                    $(this).prop("checked", true)
+                }
+            })
+        })
+
+        function submitCustomField() {
+            /*提交自定义字段*/
+            var aField = new Array()
+            $('[name=dataliCheck]').each(function (i, k) {
+                if ($(this).prop("checked")) {
+                    aField.push($(this).val())
+                }
+            })
+            console.log(aField)
+            $('#customField').attr("href", '?display_field=' + aField.join(','))
+            $('#customField')[0].click()
+
+        }
+
         function ClickMenu() {
             $('.submenu li a').click(function (i, t) {
                 var storage = window.localStorage;
@@ -294,5 +332,7 @@
             var temp_val = "#page option[value=" + {{ page_info.per_page_num }} +"]"
             $(temp_val).attr("selected", true)
         }
+
+
     </script>
 {% endblock %}

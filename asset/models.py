@@ -31,7 +31,7 @@ class Cabinet(BaseTimeField):
     idc = models.ForeignKey(verbose_name='IDC机房', to='IDC')
     device_type_choices = ((1, '服务器'), (2, '交换机'), (3, '防火墙'),)
     device_type_id = models.IntegerField(verbose_name="设备类型",choices=device_type_choices, default=1)
-    cabinet_num = models.CharField('机柜位', max_length=30, null=True, blank=True)
+    cabinet_num = models.CharField('机柜位置', max_length=30, null=True, blank=True)
     memo = models.TextField(verbose_name=u'备注', max_length=128, blank=True, null=True)
 
     class Meta:
@@ -44,19 +44,19 @@ class Cabinet(BaseTimeField):
 
 class Server(BaseTimeField):
     """服务器设备"""
-    cabinet = models.OneToOneField(verbose_name=u'机柜信息',to='Cabinet', null=True, blank=True)
+    cabinet = models.OneToOneField(verbose_name=u'机柜位置',to='Cabinet', null=True, blank=True)
     name = models.CharField(verbose_name=u'主机名',max_length=30, unique=True)
     inner_ip = models.GenericIPAddressField(verbose_name=u'内网IP', blank=True, null=True)
     management_ip = models.GenericIPAddressField(verbose_name=u'管理IP', blank=True, null=True)
-    business_unit = models.ForeignKey('BusinessUnit', verbose_name='属于的业务线', null=True, blank=True)
+    business_unit = models.ForeignKey('BusinessUnit', verbose_name='业务线', null=True, blank=True)
     device_status_choices = ((0, '在线'), (1, '已下线'), (2, '未知'), (3, '故障'), (4, '备用'),)
     device_status = models.IntegerField(verbose_name="状态",choices=device_status_choices, default=1)
     server_type_choices = ((0, '物理服务器'), (1, '宿主机'),(2, '虚拟机'),)
     server_type = models.SmallIntegerField(verbose_name="服务器类型", choices=server_type_choices, default=0)
     upper_layer = models.ForeignKey(verbose_name='所属宿主机',to='self', related_name='upperlayer', blank=True, null=True)  # v1/v2/v3
     switch = models.ForeignKey(verbose_name='所属交换机',to='NetworkDevice',blank=True, null=True)
-    os_type = models.CharField(verbose_name=u'操作系统平台', max_length=64, blank=True, null=True) # Linux、Wondows
-    os_release = models.CharField(verbose_name=u'操作系统版本', max_length=64, blank=True, null=True) # Centos6.5、RedHat5
+    os_type = models.CharField(verbose_name=u'系统平台', max_length=64, blank=True, null=True) # Linux、Wondows
+    os_release = models.CharField(verbose_name=u'系统版本', max_length=64, blank=True, null=True) # Centos6.5、RedHat5
 
     sn = models.CharField(verbose_name=u'资产SN号', max_length=128, unique=True)
     server_attr = models.CharField(verbose_name=u'设备型号', max_length=128, null=True, blank=True)
