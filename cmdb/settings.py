@@ -26,7 +26,9 @@ SECRET_KEY = '5*8-7(p627v7y@^!kt$&#&j0pb8%qi+b6q+(+dxw#=prvd!0r1'
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
-
+LOGIN_URL = '/login/'
+from django.core.urlresolvers import reverse_lazy
+LOGIN_REDIRECT_URL = '/asset/server/'
 
 # Application definition
 
@@ -38,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'asset',
+    'permission',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
@@ -48,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'permission.utils.middleware.PermissionAuth'
 ]
 
 ROOT_URLCONF = 'cmdb.urls'
@@ -63,7 +68,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'asset.context_processors.gg'
             ],
         },
     },
@@ -123,3 +127,6 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS=(
     os.path.join(BASE_DIR, "static"),
 )
+
+USER_PASSWORD_SALT = '123'
+LOGIN_URL = '/asset/server/'

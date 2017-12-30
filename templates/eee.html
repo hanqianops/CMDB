@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+     <link href="{% static "css/hsCheckData.css" %}" rel="stylesheet"/>
+</head>
+<body>
+<span>多选</span>
+<div id="cityDuoXuan" style="width:300px;"></div>
+</body>
+<script src="{% static "js/jquery-2.0.3.min.js" %}"></script>
+<script src="{% static "js/checkbox/hsCheckData.js" %}"></script>
+<script src="{% static "js/checkbox/cityData.js" %}"></script>
+<script>
+    $(function () {
+         $('#cityDanXuan').hsCheckData({
+        isShowCheckBox: false, //默认为false
+        data: cityData
+    });
+    $('#cityDuoXuan').hsCheckData({
+        isShowCheckBox: true, //默认为false
+//        minCheck: 3,//默认为0，不限最少选择个数
+//        maxCheck: 6,//默认为0，不限最多选择个数
+        data: cityData
+    });
+    $('#cityMR').hsCheckData({
+        isShowCheckBox: true,
+        data: cityData,
+        defText:'北京-上海-汕头'
+    });
+	$('#cityMR2').hsCheckData({
+        isShowCheckBox: true,
+        data: cityData
+    });
+    })
+
+</script>
+</html>

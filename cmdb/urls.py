@@ -15,9 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import url,include
 from django.contrib import admin
-import xadmin
-
+from  django.contrib.auth import views as auth_views
+from permission import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r"^login/$", views.LoginView.as_view(), name="login"),
+    url(r'^logout/$', auth_views.logout, {'next_page': '/login/'},name="logout"),
     url(r'^asset/', include('asset.urls', namespace='asset')),
 ]

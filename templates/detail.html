@@ -1,0 +1,27 @@
+{% extends "asset/base.html" %}
+{% load asset_tags %}
+
+{% block page_breadcrumbs %}
+    <li class="active">{{ object.name }}</li>
+{% endblock %}
+
+{% block body %}
+    <div class="page-body">
+        <div class="widget">
+            <div class="widget-header bordered-left bordered-blueberry">
+                <span class="widget-caption"><strong>基本信息</strong></span>
+            </div>
+            <div class="widget-body bordered-left bordered-blue" style="padding: 0px;">
+                <table class="table table-bordered table-condensed ">
+                    <tbody>
+                    {% detail object %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% if model_name == 'server' %}
+            {% include 'asset/server_detail.html' %}
+        {% endif %}
+    </div>
+
+{% endblock %}

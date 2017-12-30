@@ -15,17 +15,9 @@ from django.test.signals import template_rendered
 
 from django.db.backends.signals import connection_created
 
-
-def callback(sender, **kwargs):
-    print("xxoo_callback=========================")
-    # print(dir(sender), dir(kwargs))
-    # print(sender.__dict__, kwargs)
-    # print('Saved: {}'.format(kwargs.__dict__))
-
-
-request_finished.connect(callback)
 for app_name  in settings.INSTALLED_APPS:
     try:
         __import__( "%s.%s" %(app_name,"config"))
     except ImportError:
         pass
+

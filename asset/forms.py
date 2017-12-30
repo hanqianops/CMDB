@@ -1,6 +1,6 @@
 # # coding: utf-8
 # __author__ = "HanQian"
-#
+
 
 from django.utils.translation import ugettext_lazy as _
 from asset.models import *
@@ -14,13 +14,17 @@ from asset import models
 from django.forms import ModelForm, TextInput
 from django import forms
 from django.forms.models import modelformset_factory
-print(site.apps['asset']['server'].model.device_status_choices, "ModelForm")
+#print(site.apps['asset']['server'].model.device_status_choices, "ModelForm")
 
 
 
 
 def __new__(cls,*args,**kwargs):
     for field_name in cls.base_fields:
+
+        if field_name == 'cabinet':
+            print(dir(cls.base_fields[field_name]))
+            print(cls.base_fields[field_name].choices)
         if field_name.endswith("date"):
             cls.base_fields[field_name].widget = forms.DateTimeInput(attrs={'type': 'date'})
         elif field_name == 'memo':

@@ -5,7 +5,7 @@ from django import template
 from django.utils.safestring import mark_safe
 from asset.app_config import site
 from asset.models import BusinessUnit
-from asset.plugins.get_url import get_parameter
+from asset.plugins.page import get_parameter
 
 print(site.apps['asset']['server'].model.device_status_choices, "==00000==")
 register = template.Library()  # register变量名是固定点

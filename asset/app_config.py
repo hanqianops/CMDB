@@ -31,8 +31,24 @@ class BusinessUnitAdmin(BaseAdmin):
     list_display = ("name", "parent_unit", "principal", "memo")
     search_fields = ("name", "parent_unit__name")
 
+class UserAdmin(BaseAdmin):
+    list_display = ("username","full_name","email")
+
+class RoleAdmin(BaseAdmin):
+    list_display = ("name",)
+
+class PermissionAdmin(BaseAdmin):
+    list_display = ("name","url")
+
+class MenuAdmin(BaseAdmin):
+    list_display = ("name","parent","order")
+
 site.register(models.Server, ServerAdmin)
 site.register(models.IDC, IDCAdmin)
 site.register(models.Cabinet, CabinetAdmin)
 site.register(models.NetworkDevice, NetworkAdmin)
 site.register(models.BusinessUnit, BusinessUnitAdmin)
+site.register(models.User, UserAdmin)
+site.register(models.Role, RoleAdmin)
+site.register(models.Permission, PermissionAdmin)
+site.register(models.Menu, MenuAdmin)

@@ -1,5 +1,6 @@
 from django.db import models
-
+from cmdb import settings
+import hashlib
 
 class BaseTimeField(models.Model):
     create_date = models.DateTimeField(verbose_name="创建时间", blank=True, auto_now_add=True)  # 创建时间
@@ -44,7 +45,7 @@ class Cabinet(BaseTimeField):
 
 class Server(BaseTimeField):
     """服务器设备"""
-    cabinet = models.OneToOneField(verbose_name=u'机柜位置',to='Cabinet', null=True, blank=True)
+    cabinet = models.OneToOneField(verbose_name=u'机柜位置',related_name='cabinet',to='Cabinet', null=True, blank=True)
     name = models.CharField(verbose_name=u'主机名',max_length=30, unique=True)
     inner_ip = models.GenericIPAddressField(verbose_name=u'内网IP', blank=True, null=True)
     management_ip = models.GenericIPAddressField(verbose_name=u'管理IP', blank=True, null=True)
@@ -69,6 +70,8 @@ class Server(BaseTimeField):
     class Meta:
         verbose_name = '服务器'
         verbose_name_plural = "服务器"
+        permissions = (
+            ("delete_host", "删除主机"),)
 
     def __str__(self):
         return self.name
@@ -97,7 +100,7 @@ class NetworkDevice(BaseTimeField):
 
 class Mem(BaseTimeField):
     """内存组件"""
-    server = models.ForeignKey(verbose_name=u'所属服务器', to='Server')
+    server = models.ForeignKey(verbose_name=u'所属服务器', to='Server',related_name='mem')
     slot = models.CharField(verbose_name=u'插槽', max_length=64)
     capacity = models.IntegerField(verbose_name=u'内存大小(MB)')
     model = models.CharField(verbose_name=u'内存型号', max_length=128)
@@ -146,8 +149,6 @@ class Disk(BaseTimeField):
     )
     iface_type = models.CharField(u'接口类型', max_length=64, choices=disk_iface_choice, default='SAS')
     memo = models.TextField(u'备注', blank=True, null=True)
-
-    # auto_create_fields = ['sn', 'slot', 'manufactory', 'model', 'capacity', 'iface_type']
 
     class Meta:
         verbose_name = '硬盘'
@@ -270,6 +271,71 @@ class EventLog(models.Model):
     colored_event_type.allow_tags = True
     colored_event_type.short_description = u'事件类型'
 
+class Menu(models.Model):
+    """
+    菜单表
+    """
+    name = models.CharField(max_length=32)
+    parent = models.ForeignKey('Menu',null=True,blank=True)
+    order = models.IntegerField()
+
+    def save(self, *args, **kwargs):
+        if self.parent:
+            self.name = '-'.join([str(self.parent),str(self.name)])
+        return super(Menu, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+
+class Permission(models.Model):
+    """
+    权限表
+    """
+    name = models.CharField(verbose_name='权限名称', max_length=32)
+    url = models.CharField(verbose_name='URL', max_length=255,null=True,blank=True)
+    menu = models.ForeignKey('Menu',null=True,blank=True)
+
+    def __str__(self):
+        return "%s---%s" %(self.name,self.menu)
+
+    class Meta:
+        verbose_name = '权限'
+        verbose_name_plural = "权限"
+
+class Role(models.Model):
+    """ 角色表 """
+    name = models.CharField(verbose_name='角色', max_length=32)
+    permissions = models.ManyToManyField(verbose_name='可访问的URL', to='Permission')
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = '角色'
+        verbose_name_plural = "角色"
+
+
+class User(models.Model):
+    """ 用户表 """
+    username = models.CharField(verbose_name='用户名', max_length=32)
+    password = models.CharField(verbose_name='密码', max_length=64)
+    full_name = models.CharField(verbose_name='显示名', max_length=32)
+    email = models.EmailField(verbose_name='邮件', )
+    roles = models.ManyToManyField(verbose_name='角色', to='Role')
+
+    def save(self, *args, **kwargs):
+        if self.password:
+            hash = hashlib.md5(bytes(self.password, encoding='utf-8'))
+            hash.update(bytes(settings.USER_PASSWORD_SALT, encoding='utf-8'))
+            self.password = hash.hexdigest()
+        return super(User, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.full_name
+
+    class Meta:
+        verbose_name = '用户'
+        verbose_name_plural = "用户"
 
 class NewAssetApprovalZone(models.Model):
     """新资产待审批区，审批后存入正式数据库"""

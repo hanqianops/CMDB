@@ -1,0 +1,82 @@
+
+<div class="widget">
+    <div class="widget-header bordered-left bordered-blueberry">
+        <span class="widget-caption"><strong>CUP信息</strong></span>
+    </div>
+    <div class="widget-body bordered-left bordered-blue" style="padding: 0px;">
+        <table class="table table-bordered table-condensed ">
+            <tbody>
+            <tr>
+                <td> 核心数</td>
+                <td> 型号</td>
+                <td> 主频（MHz）</td>
+            </tr>
+            {% for i in object.cpu_set.all %}
+                <tr>
+                    <td> {{ i.count }}</td>
+                    <td> {{ i.model }}</td>
+                    <td> {{ i.speed }}</td>
+                </tr>
+            {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="widget">
+    <div class="widget-header bordered-left bordered-blueberry">
+        <span class="widget-caption"><strong>内存信息</strong></span>
+    </div>
+    <div class="widget-body bordered-left bordered-blue" style="padding: 0px;">
+        <table class="table table-bordered table-condensed ">
+            <tbody>
+            <tr>
+                <td> 插槽位</td>
+                <td> 大小（MB）</td>
+                <td> 型号</td>
+                <td> 速率</td>
+                <td> SN</td>
+            </tr>
+            {% for i in object.mem_set.all %}
+                <tr>
+                    <td> {{ i.slot }}</td>
+                    <td> {{ i.capacity }}</td>
+                    <td> {{ i.model }}</td>
+                    <td> {{ i.speed }}</td>
+                    <td> {{ i.sn }}</td>
+
+                </tr>
+            {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="widget">
+    <div class="widget-header bordered-left bordered-blueberry">
+        <span class="widget-caption"><strong>磁盘信息</strong></span>
+    </div>
+    <div class="widget-body bordered-left bordered-blue" style="padding: 0px;">
+        <table class="table table-bordered table-condensed ">
+            <tbody>
+            <tr>
+                <td> 插槽位</td>
+                <td> 容量(GB)</td>
+                <td> 接口类型</td>
+                <td> 型号</td>
+                <td> SN</td>
+            </tr>
+            {% for i in object.disk_set.all %}
+                <tr>
+                    <td> {{ i.slot }}</td>
+                    <td> {{ i.capacity }}</td>
+                    <td> {{ i.iface_type }}</td>
+                    <td> {{ i.model }}</td>
+                    <td> {{ i.sn }}</td>
+                </tr>
+            {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+</div>
