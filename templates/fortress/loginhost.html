@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block css %}
+    <link href="{% static "xterm/xterm.css" %}" rel="stylesheet"/>
+    <link href="{% static "ztree/css/demo.css" %}" rel="stylesheet"/>
+    <link href="{% static "ztree/css/zTreeStyle/zTreeStyle.css" %}" rel="stylesheet"/>
+{% endblock %}
+{% block body %}
+    <div class="page-body" id="pageBody">
+        <div class="widget">
+            <div class="widget-header ">
+                <span class="widget-caption">主机管理</span>
+                <div class="widget-buttons">
+                    <a href="#" data-toggle="maximize">
+                        <i class="fa fa-expand"></i>
+                    </a>
+                    <a href="#" data-toggle="collapse">
+                        <i class="fa fa-minus"></i>
+                    </a>
+                    <a href="#" data-toggle="dispose">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="widget-body" id="widgetBody">
+                <div class="row">
+                    <div class="col-xs-3 col-md-3">
+                        <div class="zTreeDemoBackground left" id="treeDiv">
+                            <ul id="treeDemo" class="ztree"></ul>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-9 col-md-9" >
+                        <ul id="tabHead" class="nav nav-tabs tabs-flat" role="tablist">
+                            <li class="active"><a href="#home" data-toggle="tab">Home</a></li>
+                        </ul>
+                        <div id="tabContent" class="tab-content tabs-flat" style="padding: 1px;12px">
+                            <div role="tabpanel" class="tab-pane active" id="home">单机连接主机</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}
+{% block js %}
+    <script src="{% static "xterm/xterm.js" %}"></script>
+    <script src="{% static "xterm/addons/terminado/terminado.js" %}"></script>
+    <script src="{% static "xterm/addons/attach/attach.js" %}"></script>
+    <script src="{% static "xterm/addons/fit/fit.js" %}"></script>
+    <script src="{% static "xterm/addons/search/search.js" %}"></script>
+    <script src="{% static "xterm/addons/fullscreen/fullscreen.js" %}"></script>
+    <script src="{% static "ztree/js/jquery.ztree.all.js" %}"></script>
+
+    <script>
+        var setting = {
+            check: {
+                enable: true
+            },
+            data: {
+                simpleData: {
+                    enable: true
+                }
+            },
+            callback: {
+                onClick: onClick,
+            },
+        };
+
+        var zNodes = {{ request.session.host_menu|safe }}
+            //[{'id': 17, 'name': '会员业务', 'pId': 0}, {'id': 23, 'name': '会员业务-应用', 'pId': 17}, {'id': 9, 'name': 'miu-cap-002', 'inner_ip': '1.1.1.1', 'pId': 26}, {'id': 10, 'name': 'miu-cap-001', 'inner_ip': '1.1.1.1', 'pId': 26}, {'id': 26, 'name': '会员业务-应用-cap', 'pId': 23}, {'id': 6, 'name': 'miu-mshop-001', 'inner_ip': '1.1.1.1', 'pId': 25}, {'id': 8, 'name': 'miu-mshop-002', 'inner_ip': '1.1.1.1', 'pId': 25}, {'id': 25, 'name': '会员业务-应用-mshop', 'pId': 23}, {'id': 24, 'name': '会员业务-数据库', 'pId': 17}, {'id': 18, 'name': '物流业务', 'pId': 0}, {'id': 27, 'name': '物流业务-应用', 'pId': 18}, {'id': 28, 'name': '物流业务-应用-wms', 'pId': 27}]
+
+            $(function () {
+                var h = $(document.body).outerHeight(true) - $("#treeDemo").offset().top - 100
+                if ($(window).height() - $("#treeDiv").offset().top - 40 < h) {
+                    $("#treeDemo").height(h)
+                } else {
+                    $("#treeDemo").height($(window).height() - $("#treeDiv").offset().top - 15)
+                }
+                $("#widgetBody").height($("#treeDemo").height() + 15)
+                $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+            });
+        function onClick(e, treeId, treeNode) {
+            var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+            zTree.expandNode(treeNode, null, null, null, true);
+            console.log(treeNode.inner_ip)
+            var tabId = treeNode.name
+            var ip = treeNode.inner_ip;
+            if ($("[href='#" + tabId + "']").length == 0) {
+                var tabhead = '<li><a href="#' + tabId + '"data-toggle="tab"><button class="close closeTab" id="dddaa" onclick="closeWebsocket(this);" type="button" >×</button>' + tabId + '</a></li>'
+                var tabcontent = '<div role="tabpanel" class="tab-pane" id="' + tabId + '"></div>'
+                $('#tabHead').append(tabhead)
+                $('#tabContent').append(tabcontent)
+                $('#tabHead a:last').tab('show')
+                rows = Math.round($("#tabContent").offset().top / 10)
+                make_terminal(document.getElementById(tabId), {rows: rows, cols: 90}, "ws://10.240.1.103:8000/ws/", ip);
+            } else {
+                $("[href='#" + tabId + "']").tab('show')
+            }
+        }
+
+        function closeWebsocket(obj) {
+            var id = $(obj).parent().text().substring(1)
+            var channel_name = $("#" + id).attr('channel_name')
+            $.ajax({
+                type: "POST",
+                url: 'http://10.240.1.103:8000/kill/',
+                dataType: "json",
+                data: {'channel_name': channel_name},
+                success: function (data) {
+                    if (data['status']) {
+                        toastr["success"](data['message']);
+                    }
+                },
+            })
+        };
+
+        function make_terminal(element, size, ws_url, ip) {
+            var term = new Terminal({
+                cursorBlink: true,
+                cols: size.cols,
+                rows: size.rows,
+                scrollback: 1000,
+                tabStopWidth: 4,
+                useStyle: true,
+            });
+            term.open(element, false);
+            var ws = new WebSocket("ws://10.240.1.103:8000/ws/");
+            ws.onclose
+            ws.onopen = function (event) {
+                term.fit();
+                <!--ws.send(JSON.stringify(["set_size", size.rows, size.cols,-->
+                <!--term.cols, term.rows]));-->
+                term.resize(20);
+                ws.send(JSON.stringify(["ip", ip, term.cols, term.rows]));
+                term.on('data', function (data) {
+                    ws.send(JSON.stringify(['stdin', data]));
+                });
+                term.on('title', function (title) {
+                    document.title = title;
+                    console.log('ffff')
+                });
+                term.toggleFullscreen(true);
+                ws.onmessage = function (event) {
+                    json_msg = JSON.parse(event.data);
+                    console.log(json_msg)
+                    switch (json_msg[0]) {
+                        case "stdout":
+                            term.write(json_msg[1]);
+                            break;
+                        case "disconnect":
+                            term.write("\r\n\r\n[Finished...]\r\n");
+                            break;
+                        case "channel_name":
+                            <!--console.log(json_msg[1]);-->
+                            var channel_name_attribute = document.createAttribute('channel_name')
+                            channel_name_attribute.value = json_msg[1];
+                            element.setAttributeNode(channel_name_attribute)
+                            break;
+                    }
+                };
+            };
+            return {socket: ws, term: term};
+        }
+    </script>
+{% endblock %}

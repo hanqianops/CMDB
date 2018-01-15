@@ -322,6 +322,7 @@ class User(models.Model):
     full_name = models.CharField(verbose_name='显示名', max_length=32)
     email = models.EmailField(verbose_name='邮件', )
     roles = models.ManyToManyField(verbose_name='角色', to='Role')
+    businessunit = models.ManyToManyField(verbose_name="业务分组", to=BusinessUnit,related_name='businessunit')
 
     def save(self, *args, **kwargs):
         if self.password:
@@ -336,6 +337,7 @@ class User(models.Model):
     class Meta:
         verbose_name = '用户'
         verbose_name_plural = "用户"
+
 
 class NewAssetApprovalZone(models.Model):
     """新资产待审批区，审批后存入正式数据库"""

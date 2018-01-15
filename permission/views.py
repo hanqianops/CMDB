@@ -23,6 +23,8 @@ class LoginView(View):
         hash = hashlib.md5(bytes(request.POST['password'], encoding='utf-8'))
         hash.update(bytes(settings.USER_PASSWORD_SALT, encoding='utf-8'))
         password = hash.hexdigest()
+        print("password:", password)
+
         user = User.objects.get(username=username,password=password)
         if user:
             request.session['user'] = username

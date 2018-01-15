@@ -15,7 +15,7 @@ from asset.plugins.filter import FilterSearch
 
 
 def index(request):
-    return render(request,'asset/eee.html',locals())
+    return render(request,'eee.html',locals())
 
 class Before(object):
     def dispatch(self, request, *args, **kwargs):

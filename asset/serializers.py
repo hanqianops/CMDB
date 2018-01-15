@@ -17,15 +17,28 @@ class CabinetSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ServerSerializer(serializers.ModelSerializer):
-    owner = serializers.ReadOnlyField(source='owner.username')
     mem = MemSerializer(many=True,)
-    # cabinet = CabinetSerializer(many=True,)
     class Meta:
         model = Server
         fields = '__all__'
 
+class UserServerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Server
+        fields = ('id','name','inner_ip')
 
-# class SnippetSerializer2(serializers.Serializer):
+class UserBusinessUnitSerializer(serializers.ModelSerializer):
+    server_set = UserServerSerializer(many=True)
+    class Meta:
+        model = BusinessUnit
+        fields = ('id','name','parent_unit','server_set')
+
+class UserSerializer(serializers.ModelSerializer):
+    businessunit = UserBusinessUnitSerializer(many=True)
+    class Meta:
+        model = User
+        fields = ('id', 'username','businessunit')
+        # class SnippetSerializer2(serializers.Serializer):
 #     id = serializers.IntegerField(read_only=True)
 #     title = serializers.CharField(required=False, allow_blank=True, max_length=100)
 #     code = serializers.CharField(style={'base_template': 'textarea.html'})

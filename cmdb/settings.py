@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'asset',
     'permission',
-    'rest_framework'
+    'rest_framework',
+    'fortress'
 ]
 
 MIDDLEWARE = [

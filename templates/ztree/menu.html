@@ -1,0 +1,257 @@
+{% load staticfiles %}
+<link href="{% static "ztree/css/demo.css" %}" rel="stylesheet"/>
+<link href="{% static "ztree/css/zTreeStyle/zTreeStyle.css" %}" rel="stylesheet"/>
+
+<div class="zTreeDemoBackground left" id="treeDiv">
+    <ul id="treeDemo" class="ztree"></ul>
+</div>
+
+<script src="{% static "js/jquery-2.0.3.min.js" %}"></script>
+<script src="{% static "ztree/js/jquery.ztree.all.js" %}"></script>
+
+{#    <script type="text/javascript">#}
+{#        <!--#}
+{#        var setting = {#}
+{#            view: {#}
+{#                dblClickExpand: false,#}
+{#                showLine: false#}
+{#            },#}
+{#            check: {#}
+{#                enable: true#}
+{#            },#}
+{#            data: {#}
+{#                simpleData: {#}
+{#                    enable: true#}
+{#                }#}
+{#            },#}
+{#            callback: {#}
+{#                beforeExpand: beforeExpand,#}
+{#                onExpand: onExpand,#}
+{#                onClick: onClick,#}
+{#            },#}
+{#        };#}
+{##}
+{#        var zNodes = [#}
+{#            {id: 11, pId: 0, name: "父节点 1-1", open: true, noR: true},#}
+{#            {id: 111, pId: 11, name: "叶子节点 1-1-1"},#}
+{#            {id: 112, pId: 11, name: "叶子节点 1-1-2"},#}
+{#            {id: 113, pId: 11, name: "叶子节点 1-1-3"},#}
+{#            {id: 114, pId: 11, name: "叶子节点 1-1-4"},#}
+{#            {id: 12, pId: 0, name: "父节点 1-2", open: true},#}
+{#            {id: 121, pId: 12, name: "叶子节点 1-2-1"},#}
+{#            {id: 122, pId: 12, name: "叶子节点 1-2-2"},#}
+{#            {id: 123, pId: 12, name: "叶子节点 1-2-3"},#}
+{#            {id: 124, pId: 12, name: "叶子节点 1-2-4"},#}
+{#            {id: 13, pId: 0, name: "父节点 1-3", open: true},#}
+{#            {id: 131, pId: 13, name: "叶子节点 1-3-1"},#}
+{#            {id: 132, pId: 13, name: "叶子节点 1-3-2"},#}
+{#            {id: 133, pId: 13, name: "叶子节点 1-3-3"},#}
+{#            {id: 134, pId: 13, name: "叶子节点 1-3-4"}#}
+{#        ];#}
+{#        // 单机 + 单个 + 多选#}
+{#        var zTree, rMenu;#}
+{#        $(function () {#}
+{#            $.fn.zTree.init($("#treeDemo"), setting, zNodes);#}
+{#            var h = $(document.body).outerHeight(true) - $("#treeDemo").offset().top#}
+{#            if ($(window).height() - $("#treeDiv").offset().top - 20 < h) {#}
+{#                $("#treeDemo").height(h)#}
+{#            } else {#}
+{#                $("#treeDemo").height($(window).height() - $("#treeDiv").offset().top - 15)#}
+{#            }#}
+{#            $("#widgetBody").height($("#treeDemo").height() + 15)#}
+{#            zTree = $.fn.zTree.getZTreeObj("treeDemo");#}
+{#            rMenu = $("#rMenu");#}
+{#        });#}
+{#        function createNodes(maxNodesNumInLevel, maxLevel, curLevel, curPId) {#}
+{#            if (maxNodesNumInLevel < 5) {#}
+{#                maxNodesNumInLevel = 5;#}
+{#            }#}
+{#            var nodes = [], num = 0;#}
+{#            while (num < 3) {#}
+{#                num = parseInt(Math.random() * 1024) % maxNodesNumInLevel + 1;#}
+{#            }#}
+{#            for (var i = 0; i < num; i++) {#}
+{#                var id = curPId ? curPId + "-" + i : "" + i, isParent = (parseInt(Math.random() * 9999) % 3 != 0),#}
+{#                    node = {id: id, pId: curPId, name: "N" + id};#}
+{#                nodes.push(node);#}
+{#                if (isParent && curLevel < maxLevel) {#}
+{#                    nodes = nodes.concat(createNodes(maxNodesNumInLevel, maxLevel, curLevel + 1, id));#}
+{#                }#}
+{#            }#}
+{#            return nodes;#}
+{#        }#}
+{#        var curExpandNode = null;#}
+{#        function beforeExpand(treeId, treeNode) {#}
+{#            var pNode = curExpandNode ? curExpandNode.getParentNode() : null;#}
+{#            var treeNodeP = treeNode.parentTId ? treeNode.getParentNode() : null;#}
+{#            var zTree = $.fn.zTree.getZTreeObj("treeDemo");#}
+{#            for (var i = 0, l = !treeNodeP ? 0 : treeNodeP.children.length; i < l; i++) {#}
+{#                if (treeNode !== treeNodeP.children[i]) {#}
+{#                    zTree.expandNode(treeNodeP.children[i], false);#}
+{#                }#}
+{#            }#}
+{#            while (pNode) {#}
+{#                if (pNode === treeNode) {#}
+{#                    break;#}
+{#                }#}
+{#                pNode = pNode.getParentNode();#}
+{#            }#}
+{#            if (!pNode) {#}
+{#                singlePath(treeNode);#}
+{#            }#}
+{##}
+{#        }#}
+{#        function singlePath(newNode) {#}
+{#            if (newNode === curExpandNode) return;#}
+{##}
+{#            var zTree = $.fn.zTree.getZTreeObj("treeDemo"),#}
+{#                rootNodes, tmpRoot, tmpTId, i, j, n;#}
+{##}
+{#            if (!curExpandNode) {#}
+{#                tmpRoot = newNode;#}
+{#                while (tmpRoot) {#}
+{#                    tmpTId = tmpRoot.tId;#}
+{#                    tmpRoot = tmpRoot.getParentNode();#}
+{#                }#}
+{#                rootNodes = zTree.getNodes();#}
+{#                for (i = 0, j = rootNodes.length; i < j; i++) {#}
+{#                    n = rootNodes[i];#}
+{#                    if (n.tId != tmpTId) {#}
+{#                        zTree.expandNode(n, false);#}
+{#                    }#}
+{#                }#}
+{#            } else if (curExpandNode && curExpandNode.open) {#}
+{#                if (newNode.parentTId === curExpandNode.parentTId) {#}
+{#                    zTree.expandNode(curExpandNode, false);#}
+{#                } else {#}
+{#                    var newParents = [];#}
+{#                    while (newNode) {#}
+{#                        newNode = newNode.getParentNode();#}
+{#                        if (newNode === curExpandNode) {#}
+{#                            newParents = null;#}
+{#                            break;#}
+{#                        } else if (newNode) {#}
+{#                            newParents.push(newNode);#}
+{#                        }#}
+{#                    }#}
+{#                    if (newParents != null) {#}
+{#                        var oldNode = curExpandNode;#}
+{#                        var oldParents = [];#}
+{#                        while (oldNode) {#}
+{#                            oldNode = oldNode.getParentNode();#}
+{#                            if (oldNode) {#}
+{#                                oldParents.push(oldNode);#}
+{#                            }#}
+{#                        }#}
+{#                        if (newParents.length > 0) {#}
+{#                            zTree.expandNode(oldParents[Math.abs(oldParents.length - newParents.length) - 1], false);#}
+{#                        } else {#}
+{#                            zTree.expandNode(oldParents[oldParents.length - 1], false);#}
+{#                        }#}
+{#                    }#}
+{#                }#}
+{#            }#}
+{#            curExpandNode = newNode;#}
+{#        }#}
+{#        function onExpand(event, treeId, treeNode) {#}
+{#            curExpandNode = treeNode;#}
+{#        }#}
+{#        function onClick(e, treeId, treeNode) {#}
+{#            var zTree = $.fn.zTree.getZTreeObj("treeDemo");#}
+{#            zTree.expandNode(treeNode, null, null, null, true);#}
+{#            var tabId = 'node1';#}
+{#            var ip = '10.240.1.104';#}
+{#            var tabhead = '<li><a href="#' + tabId + '"data-toggle="tab"><button class="close closeTab" type="button" >×</button>' + tabId + '</a></li>'#}
+{#            var tabcontent = '<div role="tabpanel" class="tab-pane" id="' + tabId + '"></div>'#}
+{#            $('#tabHead').append(tabhead)#}
+{#            $('#tabContent').append(tabcontent)#}
+{#            $('#tabHead a:last').tab('show')#}
+{#            rows = Math.round($("#tabContent").offset().top / 10)#}
+{#            make_terminal(document.getElementById(tabId), {rows: rows, cols: 90}, "ws://10.240.1.103:8000/ws/", ip);#}
+{##}
+{#        }#}
+{##}
+{#/***#}
+{#        function OnRightClick(event, treeId, treeNode) {#}
+{#            var obj = $(event.target).offsetParent();#}
+{#            var currentLeft = $(event.target).offset().left - obj.offset().left#}
+{#            var currentTop = $(event.target).offset().top + $(event.target).outerHeight() - obj.offset().top#}
+{##}
+{#            if (!treeNode && event.target.tagName.toLowerCase() != "button" && $(event.target).parents("a").length == 0) {#}
+{#                console.log(event.pageY, event.pageX)#}
+{#                alert('eee')#}
+{#                console.log(event.pageY, $(event.target).offset().left, obj.offset().left, currentLeft)#}
+{#                currentLeft = -$(event.target).offset().left#}
+{#                showRMenu("root", event.clientY, event.clientX);#}
+{#            } else if (treeNode && !treeNode.noR) {#}
+{#                zTree.selectNode(treeNode);#}
+{#                alert('www')#}
+{##}
+{#                showRMenu("node", currentLeft, currentTop);#}
+{##}
+{#            }#}
+{#        }#}
+{##}
+{#        function showRMenu(type, left, top) {#}
+{#            $("#rMenu ul").show();#}
+{#            if (type == "root") {#}
+{#                $("#m_del").hide();#}
+{#                $("#m_check").hide();#}
+{#                $("#m_unCheck").hide();#}
+{#            } else {#}
+{#                $("#m_del").show();#}
+{#                $("#m_check").show();#}
+{#                $("#m_unCheck").show();#}
+{#            }#}
+{#            rMenu.css({"left": left + "px", "top": top + "px", "visibility": "visible"});#}
+{##}
+{#            $("body").bind("mousedown", onBodyMouseDown);#}
+{#        }#}
+{#        function hideRMenu() {#}
+{#            if (rMenu) rMenu.css({"visibility": "hidden"});#}
+{#            $("body").unbind("mousedown", onBodyMouseDown);#}
+{#        }#}
+{#        function onBodyMouseDown(event) {#}
+{#            if (!(event.target.id == "rMenu" || $(event.target).parents("#rMenu").length > 0)) {#}
+{#                rMenu.css({"visibility": "hidden"});#}
+{#            }#}
+{#        }#}
+{#        var addCount = 1;#}
+{#        function addTreeNode() {#}
+{#            hideRMenu();#}
+{#            var newNode = {name: "增加" + (addCount++)};#}
+{#            if (zTree.getSelectedNodes()[0]) {#}
+{#                newNode.checked = zTree.getSelectedNodes()[0].checked;#}
+{#                zTree.addNodes(zTree.getSelectedNodes()[0], newNode);#}
+{#            } else {#}
+{#                zTree.addNodes(null, newNode);#}
+{#            }#}
+{#        }#}
+{#        function removeTreeNode() {#}
+{#            hideRMenu();#}
+{#            var nodes = zTree.getSelectedNodes();#}
+{#            if (nodes && nodes.length > 0) {#}
+{#                if (nodes[0].children && nodes[0].children.length > 0) {#}
+{#                    var msg = "要删除的节点是父节点，如果删除将连同子节点一起删掉。\n\n请确认！";#}
+{#                    if (confirm(msg) == true) {#}
+{#                        zTree.removeNode(nodes[0]);#}
+{#                    }#}
+{#                } else {#}
+{#                    zTree.removeNode(nodes[0]);#}
+{#                }#}
+{#            }#}
+{#        }#}
+{#        function checkTreeNode(checked) {#}
+{#            var nodes = zTree.getSelectedNodes();#}
+{#            if (nodes && nodes.length > 0) {#}
+{#                zTree.checkNode(nodes[0], checked, true);#}
+{#            }#}
+{#            hideRMenu();#}
+{#        }#}
+{#        function resetTree() {#}
+{#            hideRMenu();#}
+{#            $.fn.zTree.init($("#treeDemo"), setting, zNodes);#}
+{#        }#}
+{#        **/#}
+{#    </script>#}
+
