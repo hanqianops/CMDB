@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'asset',
     'permission',
     'rest_framework',
-    'fortress'
+    'fortress',
+    'channels'
 ]
 
 MIDDLEWARE = [
@@ -123,7 +124,8 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
-
+MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
 STATICFILES_DIRS=(
     os.path.join(BASE_DIR, "static"),
@@ -131,3 +133,16 @@ STATICFILES_DIRS=(
 
 USER_PASSWORD_SALT = '123'
 LOGIN_URL = '/asset/server/'
+
+
+CHANNEL_LAYERS = {
+    "default": {
+       "BACKEND": "asgi_redis.RedisChannelLayer",  # use redis backend
+       "CONFIG": {
+           "hosts": [("10.240.1.103", 6379)],  # set redis address
+           "channel_capacity": {"http.request": 1000, "websocket.send*": 10000,},
+           "capacity": 10000,
+           },
+       "ROUTING": "fortress.routing.channel_routing",  # load routing from our routing.py file
+       },
+}

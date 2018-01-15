@@ -1,39 +1,25 @@
-from django.shortcuts import render,HttpResponse
-from asset import models
-from asset import serializers
-
-
-def login_host(request):
-    obj = models.Server.objects.all()
-    print(request.session.__dict__,'==========================')
-    return render(request,'fortress/loginhost.html',locals())
-
-from rest_framework.renderers import JSONRenderer
-from rest_framework.parsers import JSONParser
 import json
-from django.utils.six import BytesIO
-def menu(request,user):
-    user_obj = models.User.objects.filter(username=user)
-    serializer = serializers.UserSerializer(user_obj,many=True)
-    content = JSONRenderer().render(serializer.data)
-    stream = BytesIO(content)
-    data = JSONParser().parse(stream)
-    a = json.dumps(data,ensure_ascii=False)
-    data = a.replace('parent_unit','pId')
-    data = json.loads(data)[0]
-    r=[]
-    for node in data['businessunit']:
-        # print(node)
-        for se in node['server_set']:
-            se["pId"] = node['id']
-            r.append(se)
-            print("se===",se)
-        if node['server_set'] != None:
-            node.pop("server_set")
-            if node['pId'] is None:
-                node['pId'] = 0
-            r.append(node)
-            print("node===",node)
 
-    print(r)
-    return HttpResponse(data)
+from django.http import JsonResponse
+from django.shortcuts import render, HttpResponse
+from django.views.generic import View
+
+from fortress.interactive import get_redis_instance
+
+
+def terminal(request):
+    return render(request,'fortress/terminal.html',locals())
+
+
+class CloseTerminal(View):
+    def post(self, request):
+        if request.is_ajax():
+            channel_name = request.POST.get('channel_name', None)
+            queue = get_redis_instance()
+            redis_channel = queue.pubsub()
+            queue.publish(channel_name, json.dumps(['close']))
+            return JsonResponse({'status': True, 'message': 'Terminal has been killed !'})
+        return JsonResponse({'status': False, 'message': 'Request object does not exist!'})
+
+    def get(self,req):
+        return HttpResponse('test')
